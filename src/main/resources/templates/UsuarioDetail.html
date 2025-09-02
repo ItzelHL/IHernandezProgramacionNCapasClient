@@ -1,0 +1,118 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+    <body layout:fragment="body" style="background-color: #181818; color: whitesmoke">
+        <div class="container" style="background-color: activeborder; font-family: Tahoma, sans-serif;">
+            <form style="padding-bottom: 10px">
+                <div>
+                    <fieldset disabled style="background-color: activeborder; color: whitesmoke">
+                        <legend><b>Datos generales</b></legend>
+                        <div class="row g-3" style="display: flex; justify-content: center; align-items: center;">
+                            <div style="display: flex; justify-content: center; align-items: center;">
+                                <img id="imagenUsuario" style="max-height: 200px; max-width: auto" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|"/>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2">
+                                <label for="disabledUsername" class="form-label">Username</label>
+                                <input type="text" id="disabledUsername" class="form-control" placeholder ="Username" th:field="${usuario.Username}">
+                            </div>
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledNombre" class="form-label">Nombre</label>
+                                <input type="text" id="disabledNombre" class="form-control" placeholder ="Nombre" th:field="${usuario.Nombre}">
+                            </div>
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledApellidoPaterno" class="form-label">Apellido paterno</label>
+                                <input type="text" id="disabledApellidoPaterno" class="form-control" placeholder ="ApellidoPaterno" th:field="${usuario.ApellidoPaterno}">
+                            </div>
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledApellidoMaterno" class="form-label">Apellido materno</label>
+                                <input type="text" id="disabledApellidoMaterno" class="form-control" placeholder ="ApellidoMaterno" th:field="${usuario.ApellidoMaterno}">
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledFechaNacimiento" class="form-label">Fecha de nacimiento (yyyy/MM/dd)</label>
+                                <input type="text" id="disabledFechaNacimiento" class="form-control" placeholder ="FechaNacimiento" th:field="${usuario.FechaNacimiento}">
+                            </div>
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledSexo" class="form-label">Sexo</label>
+                                <input type="text" id="disabledSexo" class="form-control" placeholder ="Sexo" th:field="${usuario.Sexo}">
+                            </div>
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledCurp" class="form-label">CURP</label>
+                                <input type="text" id="disabledCurp" class="form-control" placeholder ="Curp" th:field="${usuario.Curp}">
+                            </div>
+                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                <label for="disabledRol" class="form-label">Rol</label>
+                                <input type="text" id="disabledRol" class="form-control" placeholder ="Rol" th:field ="${usuario.rol.Nombre}">
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        <h4 class="mb-3"><b>Datos de contacto</b></h4>
+                        <div class="row g-3">
+                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                <label for="disabledEmail" class="form-label">Email</label>
+                                <input type="text" id="disabledEmail" class="form-control" placeholder ="Email" th:field="${usuario.Email}">
+                            </div>
+                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                <label for="disabledTelefono" class="form-label">Teléfono</label>
+                                <input type="text" id="disabledTelefono" class="form-control" placeholder ="Telefono" th:field="${usuario.Telefono}">
+                            </div>
+                            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                <label for="disabledCelular" class="form-label">Celular</label>
+                                <input type="text" id="disabledCelular" class="form-control" placeholder ="Celular" th:field="${usuario.Celular}">
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <a th:href="|@{/usuario/formEditable?IdUsuario=}${usuario.IdUsuario}|" class="btn btn-success mt-2 col-6 fw-bold" type="submit">Editar información <i class="bi bi-pencil-square"></i></a>
+                </div>
+
+
+                <div>
+                    <hr class="my-4">
+                    <h4 class="mb-3" style="margin-bottom: 0px"><b>Dirección</b></h4>
+                    <div class="mb-3">
+                        <table class = "table" style="background-color: activeborder; color: whitesmoke">
+                            <thead>
+                                <tr class = "table-dark">
+                                    <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >#</th>
+                                    <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Calle</th>
+                                    <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1">No. Int</th>
+                                    <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >No. Ext</th>
+                                    <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Colonia</th>
+                                    <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Código Postal</th>
+                                    <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Municipio</th>
+                                    <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Estado</th>
+                                    <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >País</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="direccion, iterStat : ${usuario.direccion}">
+                                    <td id="botonesTabla">
+                                        <a th:href="@{/usuario/update/{idDireccion}(idDireccion = ${direccion.IdDireccion})}" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+                                        <a th:href="@{/usuario/deleteD/{idDireccion}(idDireccion = ${direccion.IdDireccion})}" class="btn btn-danger"><i class="bi bi-trash3-fill"></i></a>
+                                    </td>
+                                    <td th:text="${direccion.Calle}"></td>
+                                    <td th:text="${direccion.NumeroExterior}"></td>
+                                    <td th:text="${direccion.NumeroInterior}"></td>
+                                    <td th:text="${direccion.Colonia.Nombre}"></td>
+                                    <td th:text="${direccion.Colonia.CodigoPostal}"></td>
+                                    <td th:text="${direccion.Colonia.Municipio.Nombre}"></td>
+                                    <td th:text="${direccion.Colonia.Municipio.Estado.Nombre}"></td>
+                                    <td th:text="${direccion.Colonia.Municipio.Estado.Pais.Nombre}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; padding-bottom: 10px">
+                        <a th:href="|@{/usuario/formEditable?IdDireccion=}0&IdUsuario=${usuario.IdUsuario}|" class="btn btn-success mt-2 col-6 fw-bold" type="submit">Agregar dirección <i class="bi bi-building-add"></i></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

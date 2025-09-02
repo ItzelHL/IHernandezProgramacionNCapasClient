@@ -1,0 +1,97 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+    <body layout:fragment="body" style="background-color: #181818;">
+        <div class = "container" style="font-family: Tahoma, sans-serif; ">
+            <div style="">
+                <form id="filterForm" method="post" th:action="@{/usuario}"  th:object="${usuarioBusqueda}" style="padding-top: 10px;">
+                    <div class="row gx-2 gx-md-3 mb-7">
+                        <div class= "col-md-2 mb-2 mb-md-0">
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-prepend input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control form-control-md" id="filtroNombreUsuario" placeholder="Nombre usuario" th:field="*{Nombre}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-prepend input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control form-control-md" id="filtroApellidoPaterno" placeholder="Apellido paterno" th:field="*{ApellidoPaterno}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-prepend input-group-text"><i class="bi bi-person"></i></i></span>
+                                <input type="text" class="form-control form-control-md" id="filtroApellidoMaterno" placeholder="Apellido materno" th:field="*{ApellidoMaterno}">
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-2 mb-md-0">
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-prepend input-group-text"><i class="bi bi-person-rolodex"></i></span>
+                                <select id="filtroRol" class="form-select form-select-md" aria-label="Rol" th:field="*{rol.IdRol}">
+                                    <option value= "0" selected>Rol</option>
+                                    <option th:each="rol : ${roles}" th:text="${rol.nombre}" th:value="${rol.IdRol}">One</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-2 mb-md-0">
+                            <button type="submit" class="btn btn-primary btn-md" id="botonEdit"><i class="bi-search"></i> Buscar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4 col-4" style="align-items: center; padding-bottom: 10px">
+                <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario=0)}" class="btn btn-success btn-lg" style="justify-content: center; align-items: center">Agregar usuario <i class="bi bi-person-add"></i></a>
+            </div>
+            <table class = "table table-hover table-striped-columns" style="overflow-x: auto"> 
+                <thead>
+                    <tr class = "table table-dark" style="text-align: center">
+                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >#</th>
+                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Imagen</th>
+                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Username</th>
+                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Nombre Completo</th>
+                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Datos personales</th>
+                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Contacto</th>
+                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Rol</th>
+                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">Direccion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="usuario : ${usuarios}">
+                        <td>
+                            <a th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+                            <a th:href="@{/usuario/delete/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-danger"><i class="bi bi-trash3-fill"></i></a>
+                        </td>
+                        <td>
+                            <!--                            <span th:text="|${(usuario.Imagen != null) ? 'Tengo imagen' : 'No tengo imagen'}|"></span>-->
+                            <img id="imagenUsuario" style="max-height: 80px; max-width: auto" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|"/>
+                        </td>
+                        <td th:text ="${usuario.Username}"></td>
+                        <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+                        <td>
+                            <ol>
+                                <li th:text="${usuario.FechaNacimiento}"></li>
+                                <li th:text="${usuario.Sexo}"></li>
+                                <li th:text="${usuario.Curp}"></li>
+                            </ol>
+                        </td>
+                        <td>
+                            <ol>
+                                <li th:text="${usuario.Email}"></li>
+                                <li th:text="${usuario.Telefono}"></li>
+                                <li th:text="${usuario.Celular}"></li>
+                            </ol>
+                        </td>
+                        <td th:each="rol : ${usuario.Rol}" th:text ="${rol.Nombre}"></td>
+                        <td>
+                            <ul>
+                                <li th:each=" direccion : ${usuario.Direccion}" th:text="|${direccion.calle}, ${direccion.NumeroExterior}, ${direccion.NumeroInterior},
+                                    ${direccion.Colonia.Nombre}, ${direccion.Colonia.CodigoPostal}, ${direccion.Colonia.Municipio.Nombre}, 
+                                    ${direccion.Colonia.Municipio.Estado.Nombre}, ${direccion.Colonia.Municipio.Estado.Pais.Nombre}|"></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+        </div>
+    </body>
+</html>
