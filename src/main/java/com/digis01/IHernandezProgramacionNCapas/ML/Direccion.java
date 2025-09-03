@@ -57,4 +57,13 @@ public class Direccion
     {
         return NumeroInterior;
     }
+
+    public void setColonia(Colonia colonia)
+    {
+        this.Colonia = colonia;
+    }
+    public Colonia getColonia() 
+    {
+        return Colonia;
+    }
 }

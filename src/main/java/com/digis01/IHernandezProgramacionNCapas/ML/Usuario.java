@@ -169,4 +169,22 @@ public class Usuario
     {
         return Curp;
     }
+
+    public void setRol(Rol rol) 
+    {
+        this.Rol = rol;
+    }
+    public Rol getRol() 
+    {
+        return Rol;
+    }
+
+    public void setDireccion(List<Direccion> direccion) 
+    {
+        this.Direccion = direccion;
+    }
+    public List<Direccion> getDireccion()
+    {
+        return Direccion;
+    }
 }

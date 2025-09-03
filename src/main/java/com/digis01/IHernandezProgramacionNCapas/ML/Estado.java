@@ -31,4 +31,13 @@ public class Estado
     {
         return Nombre;
     }
+
+    public void setPais(Pais pais) 
+    {
+        this.Pais = pais;
+    }
+    public Pais getPais() 
+    {
+        return Pais;
+    }
 }

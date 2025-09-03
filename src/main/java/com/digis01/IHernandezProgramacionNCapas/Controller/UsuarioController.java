@@ -50,11 +50,11 @@ public class UsuarioController
 //    <---------------------------------------------- F O R M U L A R I O S   P A R A   U S U A R I O ---------------------------------------------->
 //    VISTA PARA INDEX 
 //    UsuarioDireccionGetAll
-    @GetMapping // localhost:8080/usuario
+    @GetMapping // localhost:8081/usuario
     public String Index(Model model) {
         RestTemplate restTemplate = new RestTemplate();
         
-        ResponseEntity <Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8081/usuarioapi", 
+        ResponseEntity <Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/usuarioapi", 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<List<Usuario>>>(){
                                                                                                             });
@@ -67,41 +67,34 @@ public class UsuarioController
                 
             if (result.correct) 
             {
-                model.addAttribute("alumnos", result.object);
+                model.addAttribute("usuarios", result.object);
             } else 
             {
-                model.addAttribute("alumnos", null);
+                model.addAttribute("usuarios", null);
             }
         }
         return "UsuarioIndex";
     }
-//
-////    FILTRO DE BÚSQUEDA EN INDEX ------- PENDIENTE ------- 
-////    UsuarioGetAll
-//    @PostMapping() // localhost:8080/usuario/add
-//    public String Index(Model model, @ModelAttribute("usuarioBusqueda") Usuario usuarioBusqueda) {
-////        Result result = usuarioDAOImplementation.GetAll(usuarioBusqueda); 
-//        Result result = usuarioJPADAOImplementation.GetAll();
-//        model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-//        model.addAttribute("usuarios", result.objects);
-//        return "UsuarioIndex";
-//    }
-//
-////    VISTA QUE MUESTRA UsuarioDetail (si el usuario existe) o UsuarioForm (si el usuario no existe) 
-////    UsuarioGetById
-//    @GetMapping("/action/{IdUsuario}") // localhost:8080/usuario/action/{idUsuario}
-//    public String Add(Model model, @PathVariable("IdUsuario") int IdUsuario) {
-//        if (IdUsuario == 0) //usuario no existe - Muestra el UsuarioForm.html
-//        {
-//            model.addAttribute("paises", paisJPADAOImplementation.GetAllPais().objects);
-//            model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-//            Usuario usuario = new Usuario();
-//            model.addAttribute("usuario", usuario);
-//
-//            return "UsuarioForm";
-//        } else // IdUsuario > 0 // usuario si existe - muestra UsuarioDetail.html - DireccionesByIdUsuario
-//        {
-////            Result result = usuarioDAOImplementation.DireccionesByIdUsuario(IdUsuario); // Trae las direcciones del usuario para mostrarlas en UsuarioDetail
+
+//    VISTA QUE MUESTRA UsuarioDetail (si el usuario existe) o UsuarioForm (si el usuario no existe) 
+//    UsuarioGetById
+    @GetMapping("/action/{IdUsuario}") // localhost:8081/usuario/action/{idUsuario}
+    public String Add(Model model, @PathVariable("IdUsuario") int IdUsuario) {
+        if (IdUsuario == 0) //usuario no existe - Muestra el UsuarioForm.html
+        {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/usuarioapi",
+                                                                                                                HttpMethod.GET, HttpEntity.EMPTY,
+                                                                                                        new ParameterizedTypeReference<Result<List<Usuario>>>() {
+                                                                                                                });
+            Usuario usuario = new Usuario();
+            model.addAttribute("usuario", usuario);
+
+            return "UsuarioForm";
+        } else // IdUsuario > 0 // usuario si existe - muestra UsuarioDetail.html - DireccionesByIdUsuario
+        {
+//            Result result = usuarioDAOImplementation.DireccionesByIdUsuario(IdUsuario); // Trae las direcciones del usuario para mostrarlas en UsuarioDetail
 //                Result result = usuarioJPADAOImplementation.GetById(IdUsuario);
 //            if (result.correct) 
 //            {
@@ -110,10 +103,10 @@ public class UsuarioController
 //            {
 //                return "Error";
 //            }
-//            return "UsuarioDetail";
-//        }
-//    }
-//
+            return "UsuarioDetail";
+        }
+    }
+
 ////   VISTA QUE MUESTRA EL UsuarioForm PARA EDITAR USUARIO Y AGREGAR DIRECCION
 ////    UsuarioGetById, DireccionAdd
 //    @GetMapping("formEditable") // localhost:8080/usuario/formEditable
@@ -268,7 +261,9 @@ public class UsuarioController
 //        Result result = direccionJPADAOImplementation.Delete(IdDireccion);
 //        return "redirect:/usuario";
 //    }
-//
+
+    
+    
 ////    TRAE LA INFO DEL DDL DE ESTADO SEGÚN EL PAÍS SELECCIONADO
 //    @GetMapping("getEstadosByIdPais/{idPais}")
 //    @ResponseBody
