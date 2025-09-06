@@ -189,37 +189,13 @@
             
             $(document).ready(function ()
             {
-//                $.ajax({
-//                    type: "GET",
-//                    url:"/usuario/getPaises",
-//                    dataType: 'json',
-//                    success: function(data, textStatus, jqXHR)
-//                    {
-//                        if(data.correct)
-//                        {
-//                            $("#paisSel").empty();
-//                            $("#paisSel").append("<option value=0 selected>Selecciona un país</option>");
-//                            $.each(data.objects, function(indice, pais)
-//                            {
-//                                $("#paisSel").append("<option value=" + pais.idPais + "selected>"+ pais.nombre +"</option>")
-//                            });
-//                        } else
-//                        {
-//                            console.log("No hay datos");
-//                        } 
-//                    },
-//                    error: function (jqXHR, textStatus, errorThrown)
-//                    {
-//                        alert("Algo ha salido mal");
-//                    }
-//                });
-
                 $("#paisddl").change(function ()
                 {
                     $.ajax(
                             {
                                 type: "GET",
-                                url: "/usuario/getEstadosByIdPais/" + $("#paisddl").val(),
+                                url: "http://127.0.0.1:8080/api/estado/pais/" + $("#paisddl").val(),
+                                contentType: "application/json",
                                 dataType: 'json',
                                 success: function (data, textStatus, jqXHR)
                                 {
@@ -231,7 +207,7 @@
                                         $("#municipioddl").append("<option value=0 selected>Selecciona un municipio</option>");
                                         $("#coloniaddl").empty();
                                         $("#coloniaddl").append("<option value=0 selected>Selecciona una colonia</option>");
-                                        $.each(data.objects, function (indice, estado)
+                                        $.each(data.object, function (indice, estado)
                                         {
                                             $("#estadoddl").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>");
                                         });
@@ -251,7 +227,8 @@
                 $("#estadoddl").change(function () {
                     $.ajax({
                         type: "GET",
-                        url: "/usuario/getMunicipiosByIdEstado/" + $("#estadoddl").val(),
+                        url: "http://127.0.0.1:8080/api/municipio/estado/" + $("#estadoddl").val(),
+                        contentType: "application/json",
                         dataType: "json",
                         success: function (data, textStatus, jqXHR)
                         {
@@ -259,7 +236,7 @@
                             {
                                 $("#municipioddl").empty();
                                 $("#municipioddl").append("<option value=0 selected>Selecciona un municipio</option>");
-                                $.each(data.objects, function (indice, municipio)
+                                $.each(data.object, function (indice, municipio)
                                 {
                                     $("#municipioddl").append("<option value=" + municipio.idMunicipio + ">" + municipio.nombre + "</option>");
                                 });
@@ -279,7 +256,8 @@
                 $("#municipioddl").change(function () {
                     $.ajax({
                         type: "GET",
-                        url: "/usuario/getColoniasByIdMunicipio/" + $("#municipioddl").val(),
+                        url: "http://127.0.0.1:8080/api/colonia/municipio/" + $("#municipioddl").val(),
+                        contentType: "application/json",
                         dataType: "json",
                         success: function (data, textStatus, jqXHR)
                         {
@@ -287,7 +265,7 @@
                             {
                                 $("#coloniaddl").empty();
                                 $("#coloniaddl").append("<option value=0 selected>Selecciona una colonia</option>");
-                                $.each(data.objects, function (indice, colonia)
+                                $.each(data.object, function (indice, colonia)
                                 {
                                     $("#coloniaddl").append("<option value=" + colonia.idColonia + ">" + colonia.nombre + "</option>");
                                     $("#coloniaddl").change(function ()
