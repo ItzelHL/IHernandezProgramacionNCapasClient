@@ -398,13 +398,13 @@ public class UsuarioController
                 {     
                     model.addAttribute("paises", resultPais.object);
                     
-                    ResponseEntity<Result<List<Estado>>> responseEstado = restTemplate.exchange("http://localhost:8080/api/estado/pais/" + ((Direccion) resultDireccion.object).Colonia.Municipio.Estado.Pais.getIdPais(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Estado>>>(){});
+                    ResponseEntity<Result<List<Estado>>> responseEstado = restTemplate.exchange("http://127.0.0.1:8080/api/estado/pais/" + ((Direccion) resultDireccion.object).Colonia.Municipio.Estado.Pais.getIdPais(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Estado>>>(){});
                     model.addAttribute("estados", responseEstado.getBody().object);
                     
-                    ResponseEntity<Result<List<Municipio>>> responseMunicipio = restTemplate.exchange("http://localhost:8080/api/municipio/estado/" + ((Direccion) resultDireccion.object).Colonia.Municipio.Estado.getIdEstado(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Municipio>>>(){});
+                    ResponseEntity<Result<List<Municipio>>> responseMunicipio = restTemplate.exchange("http://127.0.0.1:8080/api/municipio/estado/" + ((Direccion) resultDireccion.object).Colonia.Municipio.Estado.getIdEstado(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Municipio>>>(){});
                     model.addAttribute("municipios", responseMunicipio.getBody().object);
                     
-                    ResponseEntity<Result<List<Colonia>>> responseColonia = restTemplate.exchange("http://localhost:8080/api/colonia/municipio/" + ((Direccion) resultDireccion.object).Colonia.Municipio.getIdMunicipio(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Colonia>>>(){});
+                    ResponseEntity<Result<List<Colonia>>> responseColonia = restTemplate.exchange("http://127.0.0.1:8080/api/colonia/municipio/" + ((Direccion) resultDireccion.object).Colonia.Municipio.getIdMunicipio(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Colonia>>>(){});
                     model.addAttribute("colonias", responseColonia.getBody().object);
                             
                 } else 
