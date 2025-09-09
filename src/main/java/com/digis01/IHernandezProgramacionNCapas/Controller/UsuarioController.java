@@ -2,7 +2,6 @@ package com.digis01.IHernandezProgramacionNCapas.Controller;
 
 import com.digis01.IHernandezProgramacionNCapas.ML.Colonia;
 import com.digis01.IHernandezProgramacionNCapas.ML.Direccion;
-import com.digis01.IHernandezProgramacionNCapas.ML.ErrorCM;
 import com.digis01.IHernandezProgramacionNCapas.ML.Estado;
 import com.digis01.IHernandezProgramacionNCapas.ML.Municipio;
 import com.digis01.IHernandezProgramacionNCapas.ML.Pais;
@@ -31,10 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,7 +42,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -223,28 +219,29 @@ public class UsuarioController
             
         } else if (IdDireccion == 0) // Vista para agregar dirección // IdUsuario > 0 && IdDireccion == 0
         {
-//            Result result = direccionJPADAOImplementation.AddDireccion(IdUsuario);
-//            if (result.correct && result.object != null) 
-//            {
-//                Usuario usuario = (Usuario) result.object;
-//                if (usuario.getDireccion() == null) 
-//                {
-//                    usuario.setDireccion(new ArrayList<>());
-//                    usuario.Direccion.add(new Direccion(0));
-//                }
-//                model.addAttribute("paises", paisJPADAOImplementation.GetAllPais().objects);
-//                model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-//                model.addAttribute("usuario", usuario);
-//            }
-//            return "UsuarioForm";
-//        } //else if (IdDireccion > 0) // Editar direccion // IdUsuario > 0 && IdDireccion > 0
-////        {
-//////            Result result = direccionJPADAOImplementation.UpdateDireccion(IdDireccion);
-//////            Usuario usuario = (Usuario) result.object;
-////            model.addAttribute("paises", paisJPADAOImplementation.GetAllPais().objects);
-////            model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-//////            model.addAttribute("usuario", usuario);
-////           return "UsuarioForm";
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(IdUsuario);
+            model.addAttribute("usuario", usuario);
+            
+            Direccion direccion = new Direccion();
+            model.addAttribute("direccion", direccion);
+            
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity <Result<List<Pais>>> responsePais = restTemplate.exchange("http://localhost:8080/api/pais", 
+                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
+                                                                                                            new ParameterizedTypeReference<Result<List<Pais>>>(){
+                                                                                                            });
+            if (responsePais.getStatusCode() == HttpStatusCode.valueOf(200)) 
+            {
+                Result resultPais = responsePais.getBody();
+                if (resultPais.correct) 
+                {
+                    model.addAttribute("paises", resultPais.object);
+                } else {
+                    model.addAttribute("paises", null);
+                }
+            }
+            return "UsuarioForm";
         }
         return "redirect:/usuario";
     }
@@ -254,8 +251,8 @@ public class UsuarioController
 //    UsuarioDireccionAdd, UsuarioUpdate, DireccionAdd, DireccionUpdate
     @PostMapping("add") // localhost:8080/usuario/add   
     public String Add(@ModelAttribute("usuario") Usuario usuario, BindingResult bindingResult, Model model,
-            @RequestParam("imagenFile") MultipartFile imagen) {
-        if (bindingResult.hasErrors())
+            @RequestParam(required = false, value = "imagenFile") MultipartFile imagen) {
+        if (bindingResult.hasErrors()) 
         {
             model.addAttribute("usuario", usuario);
             return "UsuarioForm";
@@ -267,60 +264,187 @@ public class UsuarioController
                 RestTemplate restTemplate = new RestTemplate();
                 HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
                 ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/usuario/add",
-                                                                                                                                      HttpMethod.POST, entity,
-                                                                                                                                new ParameterizedTypeReference<Result<Usuario>>() {
-                                                                                                                                                });
-
-                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                                                                                                                                                     HttpMethod.POST, entity,
+                                                                                                                              new ParameterizedTypeReference<Result<Usuario>>() 
+                                                                                                                                                      {   });
+                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) 
+                {
                     model.addAttribute("usuario", new Usuario());
                     Result result = responseUsuario.getBody();
 
-                    if (result.correct) {
+                    if (result.correct) 
+                    {
                         model.addAttribute("usuario", result.object);
-                    } else {
+                    } else 
+                    {
                         model.addAttribute("usuario", null);
                     }
                 }
                 return "redirect:/usuario";
-            }
-            else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() == -1) // Editar usuario
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() == -1) // Editar usuario
             {
                 usuario.setImagen(validarImagen(imagen));
                 RestTemplate restTemplate = new RestTemplate();
                 HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
                 ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/usuario/" + usuario.getIdUsuario(),
-                                                                                                                                      HttpMethod.PUT, entity,
-                                                                                                                                new ParameterizedTypeReference<Result<Usuario>>() {
-                                                                                                                                                });
-
-                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                                                                                                                                                        HttpMethod.PUT, entity,
+                                                                                                                            new ParameterizedTypeReference<Result<Usuario>>() {
+                                                                                                                                                     });
+                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) 
+                {
                     model.addAttribute("usuario", new Usuario());
                     Result result = responseUsuario.getBody();
 
-                    if (result.correct) {
+                    if (result.correct) 
+                    {
                         model.addAttribute("usuario", result.object);
-                    } else {
+                    } else 
+                    {
                         model.addAttribute("usuario", null);
                     }
                 }
                 return "redirect:/usuario/action/" + usuario.getIdUsuario();
-            }
-            else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() == 0) // Agregar dirección
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() == 0) // Agregar dirección
             {
-//                Result result = direccionJPADAOImplementation.AddDireccion(usuario.getIdUsuario());
-//                model.addAttribute("paises", paisJPADAOImplementation.GetAllPais().objects);
-//                model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-                return "redirect:/usuario";
-            }
-            else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() > 0) // Editar dirección
+                RestTemplate restTemplate = new RestTemplate();
+                HttpEntity<Direccion> entity = new HttpEntity<>(usuario.Direccion.get(0));
+                ResponseEntity<Result<Direccion>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/direccion/add/" + usuario.getIdUsuario(),
+                                                                                                                                                    HttpMethod.POST, entity,
+                                                                                                                        new ParameterizedTypeReference<Result<Direccion>>() {
+                                                                                                                                                        });
+                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                    model.addAttribute("direccion", new Direccion());
+                    Result result = responseUsuario.getBody();
+
+                    if (result.correct) 
+                    {
+                        model.addAttribute("direccion", result.object);
+                    } else 
+                    {
+                        model.addAttribute("direccion", null);
+                    }
+                    return "redirect:/usuario/action/" + usuario.getIdUsuario();
+                }
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() > 0) // Editar dirección
             {
-//                Result result = direccionJPADAOImplementation.UpdateDireccion(usuario);
-//                model.addAttribute("paises", paisJPADAOImplementation.GetAllPais().objects);
-//                model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-                return "redirect:/usuario";
+                Direccion direccion = new Direccion();
+                model.addAttribute("direccion", direccion);
+
+                RestTemplate restTemplate = new RestTemplate();
+                HttpEntity<Direccion> entity = new HttpEntity<>(usuario.Direccion.get(0));
+                ResponseEntity<Result<Direccion>> responseEntity = restTemplate.exchange("http://localhost:8080/api/direccion/" + usuario.getIdUsuario() +"/direccion/" + usuario.Direccion.get(0).getIdDireccion(),
+                                                                                                            HttpMethod.PUT, entity,
+                                                                                                                            new ParameterizedTypeReference<Result<Direccion>>() {
+                                                                                                                    });
+                if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200)) 
+                {
+                    Result resultDireccion = responseEntity.getBody();
+                    if (resultDireccion.correct) 
+                    {
+                        model.addAttribute("direccion", resultDireccion.object);
+                    } else 
+                    {
+                        model.addAttribute("direccion", null);
+                    }
+                }
+                return "redirect:/usuario/action/" + usuario.getIdUsuario();
+            }
+            return "redirect:/usuario/action/" + usuario.getIdUsuario();
+        }
+    }
+    
+//    VISTA PARA EDITAR DIRECCION
+//    IdUsuario > 0 && IdDireccion > 0
+//    DireccionUpdate
+    @GetMapping("/update") 
+    public String Update(@RequestParam("IdDireccion") int IdDireccion, @RequestParam("IdUsuario") int IdUsuario, Model model){
+       if (IdDireccion > 0) // Vista para editar direccion - Muestra el UsuarioForm.html
+        {     
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity <Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8080/api/direccion/detail/" + IdDireccion, 
+                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
+                                                                                                            new ParameterizedTypeReference<Result<Direccion>>(){
+                                                                                                            });
+            ResponseEntity <Result<List<Pais>>> responsePais = restTemplate.exchange("http://localhost:8080/api/pais", 
+                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
+                                                                                                            new ParameterizedTypeReference<Result<List<Pais>>>(){
+                                                                                                            });
+            Result resultDireccion = responseDireccion.getBody();
+            if (responseDireccion.getStatusCode() == HttpStatusCode.valueOf(200)) 
+            {
+                
+                if (resultDireccion.correct) 
+                {
+                    Direccion direccion = new Direccion();
+                    direccion.setIdDireccion(IdDireccion);
+                    direccion = (Direccion) resultDireccion.object;
+                    
+                    Usuario usuario  = new Usuario();
+                    direccion.Usuario = usuario;
+                    direccion.Usuario.setIdUsuario(IdUsuario);
+                    
+                    usuario.Direccion = new ArrayList<>();
+                    usuario.Direccion.add(direccion);
+                    model.addAttribute("usuario", usuario);
+                } else 
+                {
+                    model.addAttribute("paises", null);
+                }
+            }
+            if (responsePais.getStatusCode() == HttpStatusCode.valueOf(200)) 
+            {
+                Result resultPais = responsePais.getBody();
+                if (resultPais.correct) 
+                {     
+                    model.addAttribute("paises", resultPais.object);
+                    
+                    ResponseEntity<Result<List<Estado>>> responseEstado = restTemplate.exchange("http://localhost:8080/api/estado/pais/" + ((Direccion) resultDireccion.object).Colonia.Municipio.Estado.Pais.getIdPais(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Estado>>>(){});
+                    model.addAttribute("estados", responseEstado.getBody().object);
+                    
+                    ResponseEntity<Result<List<Municipio>>> responseMunicipio = restTemplate.exchange("http://localhost:8080/api/municipio/estado/" + ((Direccion) resultDireccion.object).Colonia.Municipio.Estado.getIdEstado(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Municipio>>>(){});
+                    model.addAttribute("municipios", responseMunicipio.getBody().object);
+                    
+                    ResponseEntity<Result<List<Colonia>>> responseColonia = restTemplate.exchange("http://localhost:8080/api/colonia/municipio/" + ((Direccion) resultDireccion.object).Colonia.Municipio.getIdMunicipio(), HttpMethod.GET, HttpEntity.EMPTY, new ParameterizedTypeReference<Result<List<Colonia>>>(){});
+                    model.addAttribute("colonias", responseColonia.getBody().object);
+                            
+                } else 
+                {
+                    model.addAttribute("paises", null);
+                }
+            }
+            return "UsuarioForm";
+        }
+        return "UsuarioForm";
+    }
+
+//    VISTA Y MÉTODO PARA RETORNAR LUEGO DE ELIMINAR LA DIRECCIÓN DE UN USUARIO
+    @GetMapping("/deleteD")
+    public String DeleteDireccion(@RequestParam("IdDireccion") int IdDireccion, Model model, @RequestParam("IdUsuario") int IdUsuario){
+        Direccion direccion = new Direccion();
+        direccion.setIdDireccion(IdDireccion);
+        direccion.Usuario = new Usuario();
+        direccion.Usuario.setIdUsuario(IdUsuario);
+        
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Result<Direccion>> responseEntity = restTemplate.exchange("http://localhost:8080/api/direccion/" + IdDireccion,
+                                                                                                                                HttpMethod.DELETE, HttpEntity.EMPTY,
+                                                                                                                                new ParameterizedTypeReference<Result<Direccion>>() {
+                                                                                                                                 });
+
+        if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200)) 
+        {
+            model.addAttribute("direccion", new Direccion());
+            Result result = responseEntity.getBody();
+
+            if (result.correct) 
+            {
+                model.addAttribute("direccion", result.object);
+            } else 
+            {
+                model.addAttribute("direccion", null);
             }
         }
-        return "redirect:/usuario";
+         return "redirect:/usuario/action/" + IdUsuario;
     }
     
 //    VALIDA QUE EL FORMATO DE LA IMAGEN SEA CORRECTO Y LO CONVIERTE A BASE64
@@ -345,52 +469,6 @@ public class UsuarioController
                 }
             }
             return null;
-        }
-        return null;
-    }
-    
-//    VISTA PARA EDITAR DIRECCION
-//    IdUsuario > 0 && IdDireccion > 0
-//    DireccionUpdate
-    @GetMapping("update/{IdDireccion}") 
-    public String Update(@PathVariable("IdDireccion") int IdDireccion, Model model){
-//        if (IdDireccion > 0) // direccion existe - Muestra el UsuarioForm.html
-//        {
-//            model.addAttribute("paises", paisJPADAOImplementation.GetAllPais().objects);
-//            model.addAttribute("roles", rolJPADAOImplementation.GetAll().objects);
-//            Direccion direccion = new Direccion();
-//            model.addAttribute("direccion", direccion);
-//        }
-        return "UsuarioForm";
-    }
-
-//    VISTA Y MÉTODO PARA RETORNAR LUEGO DE ELIMINAR LA DIRECCIÓN DE UN USUARIO
-    @GetMapping("deleteD/{IdDireccion}")
-    public String DeleteDireccion(@PathVariable("IdDireccion") int IdDireccion){
-//        Result result = direccionJPADAOImplementation.Delete(IdDireccion);
-        return "redirect:/usuario";
-    }
-    
-//    VALIDA EL FORMATO DE LA IMAGEN Y LO CONVIERTE A BASE64
-    public MultipartFile validacionImagen (MultipartFile imagen, Usuario usuario)
-    {
-        if (imagen != null && imagen.getOriginalFilename() != "") 
-        {
-            String nombre = imagen.getOriginalFilename();
-            String extension = nombre.split("\\.")[1];
-            if (extension.equals("jpg") || extension.equals("jpeg") || extension.equals("png")) 
-            {
-                try 
-                {
-                    byte[] bytes = imagen.getBytes();
-                    String base64Image = Base64.getEncoder().encodeToString(bytes);
-                    usuario.setImagen(base64Image);
-                } 
-                catch (Exception ex) 
-                {
-                    System.out.println("Solo se permiten archivos .jpg, .jpeg, .png");
-                }
-            }
         }
         return null;
     }

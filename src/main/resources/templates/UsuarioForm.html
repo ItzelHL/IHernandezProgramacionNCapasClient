@@ -54,11 +54,11 @@
                                 <h6>Sexo</h6>
                                 <div>
                                     <label for="sexoF">Femenino</label>
-                                    <input type="radio" id="sexoF" name="drone" value="F" checked th:field="*{Sexo}" />
+                                    <input type="radio" id="sexoF" name="drone" value="F" th:field="*{Sexo}" checked/>
                                 </div>
                                 <div>
                                     <label for="sexoM">Masculino</label>
-                                    <input type="radio" id="sexoM" name="drone" value="M" checked th:field="*{Sexo}"/>
+                                    <input type="radio" id="sexoM" name="drone" value="M" th:field="*{Sexo}" checked/>
                                 </div>
                             </fieldset>
                             <span class="text-danger" th:if="${#fields.hasErrors('Sexo')}" th:errors="*{Sexo}">Message error</span>
@@ -124,12 +124,12 @@
                             <label for="estadoddl" class="form-label fw-bold">Estado</label>
                             <select id="estadoddl" class="form-select" aria-label="Selecciona un estado" th:field="*{Direccion[0].Colonia.Municipio.Estado.IdEstado}">
                                 <option value= "0" selected>Selecciona un estado</option>
-                                <option th:each="estado : ${estados}" th:value="${estado.IdEstado}" th:text="${Estado.Nombre}">One</option>
+                                <option th:each="estado : ${estados}" th:value="${estado.IdEstado}" th:text="${estado.Nombre}">One</option>
                             </select>
                         </div>
                         <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2" data-bs-theme="dark">
                             <label for="municipioddl" class="form-label fw-bold">Municipio</label>
-                            <select id="municipioddl" class="form-select" aria-label="Selecciona un municipio" th:field="*{Direccion[0].Colonia.Municipio.IdMunicipio}">
+                            <select id="municipioddl" class="form-select" aria-label="Selecciona un municipio" th:field="*{Direccion[0].Colonia.Municipio.idMunicipio}">
                                 <option value= "0" selected>Selecciona un municipio</option>
                                 <option th:each="municipio : ${municipios}" th:value="${municipio.IdMunicipio}" th:text="${municipio.Nombre}">One</option>
                             </select>
@@ -163,15 +163,14 @@
                     </div>
                 </div>
                 <div th:if="*{(IdUsuario == 0 && Direccion[0].IdDireccion == 0) || (IdUsuario > 0 && Direccion[0].IdDireccion == 0)}">
-                    <button type="submit" class="btn btn-success mt-4 w-100 fw-bold" id="botonAdd" th:href="@{/usuario/add}" onclick="validarPasswords()" >Agregar</button>
+                    <button type="submit" class="btn btn-success mt-4 w-100 fw-bold" id="botonAdd" th:href="@{/usuario/add}" onclick="validarPasswords()">Agregar</button>
                 </div>
-                <div th:if="*{(IdUsuario > 0 && Direccion[0].IdDireccion == -1) || (IdUsuario > 0 && Direccion[0].IdDireccion > 0) }">
+                <div th:if="*{(IdUsuario > 0 && Direccion[0].IdDireccion == -1) || (IdUsuario > 0 && Direccion[0].IdDireccion > 0)}">
                     <button type="submit" class="btn btn-success mt-4 w-100 fw-bold" id="botonEdit" th:ref="@{/usuario/action/{IdUsuario}/update}">Editar</button>
                 </div>
             </form>
         </div>
         <script>
-
             function validarPasswords()
             {
                 var pass = document.getElementById("password").value;
@@ -186,6 +185,79 @@
                     document.getElementById("userForm").submit();
                 }
             }
+            
+//            $(document).ready(function(){
+//                $.ajax(
+//                        {
+//                            type: "GET",
+//                            dataType: 'json',
+//                            success: function (data, textStatus, jqXHR)
+//                            {
+//                                if (data.correct)
+//                                {
+//                                    $.each(data.object, function (indice, estado)
+//                                    {
+//                                        $("#estadoddl").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>");
+//                                    });
+//                                } else
+//                                {
+//                                    console.log("No hay datos");
+//                                }
+//                            }, error: function (jqXHR, textStatus, errorThrown)
+//                            {
+//                                alert("Algo ha salido mal.");
+//                            }
+//                        });
+//                        
+//                $.ajax(
+//                        {
+//                            type: "GET",
+//                            url: "http://127.0.0.1:8080/api/municipio",
+//                            contentType: "application/json",
+//                            dataType: "json",
+//                            success: function (data, textStatus, jqXHR)
+//                            {
+//                                if (data.correct)
+//                                {
+//                                    $.each(data.object, function (indice, municipio)
+//                                    {
+//                                        $("#municipioddl").append("<option value=" + municipio.idMunicipio + ">" + municipio.nombre + "</option>");
+//                                    });
+//                                } else
+//                                {
+//                                    console.log("No hay datos");
+//                                }
+//                            }, error: function (textStatus, jqXHR, errorThrown)
+//                            {
+//                                alert("Algo ha salido mal.");
+//                            }
+//                        });
+//                    
+//                 $.ajax(
+//                         {
+//                             type: "GET",
+//                             url: "http://127.0.0.1:8080/api/colonia",
+//                             contentType: "application/json",
+//                             dataType: "json",
+//                             success: function (data, textStatus, jqXHR)
+//                             {
+//                                 if (data.correct)
+//                                 {
+//                                     $.each(data.object, function (indice, colonia)
+//                                     {
+//                                         $("#coloniaddl").append("<option value=" + colonia.idColonia + ">" + colonia.nombre + "</option>");
+//                                     });
+//                                 } else
+//                                 {
+//                                     console.log("No hay datos");
+//                                 }
+//                             }, error: function (textStatus, jqXHR, errorThrown)
+//                             {
+//                                 alert("Algo ha salido mal.");
+//                             }
+//                         });
+//                     });
+//            
             
             $(document).ready(function ()
             {
@@ -224,8 +296,10 @@
                 });
 
 
-                $("#estadoddl").change(function () {
-                    $.ajax({
+                $("#estadoddl").change(function () 
+                {
+                    $.ajax(
+                            {
                         type: "GET",
                         url: "http://127.0.0.1:8080/api/municipio/estado/" + $("#estadoddl").val(),
                         contentType: "application/json",
@@ -253,8 +327,10 @@
                 });
 
 
-                $("#municipioddl").change(function () {
-                    $.ajax({
+                $("#municipioddl").change(function () 
+                {
+                    $.ajax(
+                            {
                         type: "GET",
                         url: "http://127.0.0.1:8080/api/colonia/municipio/" + $("#municipioddl").val(),
                         contentType: "application/json",

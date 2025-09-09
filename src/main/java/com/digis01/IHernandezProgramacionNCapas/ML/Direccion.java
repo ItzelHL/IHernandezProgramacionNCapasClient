@@ -1,5 +1,7 @@
 package com.digis01.IHernandezProgramacionNCapas.ML;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Direccion 
 {
     private int IdDireccion;
@@ -7,6 +9,9 @@ public class Direccion
     private String NumeroInterior;
     private String NumeroExterior;
     public Colonia Colonia;
+    @JsonIgnore 
+    public Usuario Usuario;
+    
     public Direccion(){}
     
     public Direccion( int idDireccion)
@@ -20,6 +25,16 @@ public class Direccion
         this.Calle = calle;
         this.NumeroInterior = numeroInterior;
         this.NumeroExterior = numeroExterior;
+    }
+    
+    public Direccion(int idDireccion, String calle, String numeroInterior, String numeroExterior, Colonia colonia, Usuario usuario) 
+    {
+        this.IdDireccion = idDireccion;
+        this.Calle = calle;
+        this.NumeroInterior = numeroInterior;
+        this.NumeroExterior = numeroExterior;
+        this.Colonia = colonia;
+        this.Usuario = usuario;
     }
     
     public void setIdDireccion(int idDireccion) 
