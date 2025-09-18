@@ -21,17 +21,18 @@
             </div>
             <br>
             <div class="row g-3" id="formularioArchivo" style="display: none">
-                <form action="/usuario/cargaMasiva" method="post" enctype="multipart/form-data">
+                <form action="/usuario/cargamasiva" method="post" enctype="multipart/form-data">
                     <input type="file" id="archivo" name="archivo" accept=".xlsx, .txt">
                     <button type="submit" class="btn btn-success btn-lg" id="cargaMasiva">Subir archivo</button>
                 </form>
             </div>
+            <p th:if="${mensaje}" th:text="${mensaje}"></p>
             <div th:if="${archivoCorrecto != null}">
-                <div th:if="${listaErrores.isEmpty()}">
+                <div th:if="${listaErrores != null and #lists.isEmpty(listaErrores)}">
                     <h4>Archivo correcto: </h4>
-                    <a th:href="@{/usuario/cargaMasiva/procesar}" class="btn btn-success btn-lg">Procesar archivo</a>
+                    <a th:href="@{/usuario/cargamasiva/procesar}" class="btn btn-success btn-lg">Procesar archivo</a>
                 </div>
-                <div th:if="${!listaErrores.isEmpty()}">
+                <div th:if="${listaErrores != null and !#lists.isEmpty(listaErrores)}">
                     <h4>Archivo incorrecto: </h4>
                     <table class="table">
                         <thead class="table-dark">
@@ -70,7 +71,7 @@
                 document.getElementById("cargaMasiva").classList.add("btn-success");
             });
 
-            document.getElementById("btnTxt").addEventListener("click", function ()
+            document.getElementById("btnTxt").addEventListener("click", function () //PERMITE ARCHIVOS TXT
             {
                 tipoArchivo = "txt";
                 document.getElementById("formularioArchivo").style.display = "block";
@@ -80,7 +81,7 @@
                 document.getElementById("cargaMasiva").classList.add("btn-primary");
             });
 
-            document.getElementById("archivo").addEventListener("change", function ()
+            document.getElementById("archivo").addEventListener("change", function () // MANDA EL ERROR SI NO CORRESPONDE
             {
                 if (this.files.length > 0)
                 {

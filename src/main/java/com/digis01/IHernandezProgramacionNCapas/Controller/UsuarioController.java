@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,21 +22,26 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javassist.compiler.Javac;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -42,6 +49,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -474,232 +482,116 @@ public class UsuarioController
     }
 
 ////    <-------------------------------------------------------- C A R G A   M A S I V A -------------------------------------------------------->
-////    VISTA PARA LA CARGA MASIVA
-//    @GetMapping("cargaMasiva") // localhost:8080/usuario/cargaMasiva
-//    public String CargaMasiva() {
-//        return "CargaMasiva";
-//    }
-//
-////    NOMBRA EL ARCHIVO COMO ÚNICO, LO GUARDA Y VALIDA QUE SEA EXCEL O TXT
-//    @PostMapping("cargaMasiva") // localhost:8080/usuario/cargaMasiva
-//    public String CargaMasiva(@RequestParam("archivo") MultipartFile file, Model model, HttpSession session) {
-//        String root = System.getProperty("user.dir");
-//        String rutaArchivo = "/src/main/resources/archivos/";
-//        String fechaSubida = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmSS"));
-//        String rutaFinal = root + rutaArchivo + fechaSubida + file.getOriginalFilename();
-//
-//        try {
-//            file.transferTo(new File(rutaFinal)); //Guarda el archivo en la ruta "/src/main/resources/archivos/" asignada con el nuevo nombre
-//        } catch (Exception ex) {
-//            System.out.println(ex.getLocalizedMessage());
-//        }
-//
-//        if (file.getOriginalFilename().split("\\.")[1].equals("txt")) //txt
-//        {
-//            List<Usuario> usuarios = ProcesarTXT(new File(rutaFinal)); // Manda a leer los campos del archivo TXT 
-//            List<ErrorCM> errores = ValidarDatos(usuarios);
-//
-//            if (errores.isEmpty()) {
-//                model.addAttribute("listaErrores", errores);
-//                model.addAttribute("archivoCorrecto", true);
-//                session.setAttribute("path", rutaFinal);
-//            } else {
-//                model.addAttribute("listaErrores", errores);
-//                model.addAttribute("archivoCorrecto", false);
-//            }
-//        } else // excel
-//        {
-//            List<Usuario> usuarios = ProcesarExcel(new File(rutaFinal)); // Manda a leer los campos del archivo Excel
-//            List<ErrorCM> errores = ValidarDatos(usuarios);
-//
-//            if (errores.isEmpty()) {
-//                model.addAttribute("listaErrores", errores);
-//                model.addAttribute("archivoCorrecto", true);
-//                session.setAttribute("path", rutaFinal);
-//            } else {
-//                model.addAttribute("listaErrores", errores);
-//                model.addAttribute("archivoCorrecto", false);
-//            }
-//        }
-//        return "CargaMasiva";
-//    }
-//
-////    MUESTRA LA VISTA PARA PROCESAR EL ARCHIVO UNA VEZ QUE VALIDÓ QUE EL TIPO DE ARCHIVO ERA CORRECTO
-//    @GetMapping("cargaMasiva/procesar") // localhost:8080/usuario/cargaMasiva/procesar
-//    public String CargaMasiva(HttpSession session) {
-//        try {
-//            String ruta = session.getAttribute("path").toString();
-//            List<Usuario> usuarios;
-//
-//            if (ruta.split("\\.")[1].equals("txt")) {
-//                usuarios = ProcesarTXT(new File(ruta));
-//            } else {
-//                usuarios = ProcesarExcel(new File(ruta));
-//            }
-//
-//            for (Usuario usuario : usuarios) {
-//                usuarioJPADAOImplementation.Add(usuario);
-//            }
-//
-//            session.removeAttribute("path");
-//        } catch (Exception ex) {
-//            System.out.println(ex.getLocalizedMessage());
-//        }
-//        return "redirect:/usuario";
-//    }
-//
-////    LEE LOS CAMPOS DEL ARCHIVO TXT Y LOS DESGLOSA SEGÚN LO NECESARIO PARA AGREGAR AL USUARIO
-//    private List<Usuario> ProcesarTXT(File file) {
-//        try {
-//            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-//
-//            String linea = "";
-//            List<Usuario> usuarios = new ArrayList<>();
-//            while ((linea = bufferedReader.readLine()) != null) {
-//                String[] campo = linea.split("\\|");
-//                Usuario usuario = new Usuario();
-//                usuario.setUsername(campo[0]);
-//                usuario.setNombre(campo[1]);
-//                usuario.setApellidoPaterno(campo[2]);
-//                usuario.setApellidoMaterno(campo[3]);
-//                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//                Date fecha = campo[4] == "" ? null : format.parse(campo[4]);
-//                usuario.setFechaNacimiento(fecha);
-//                usuario.setSexo(campo[5]);
-//                usuario.setCurp(campo[6]);
-//                usuario.setEmail(campo[7]);
-//                usuario.setPassword(campo[8]);
-//                usuario.setTelefono(campo[9]);
-//                usuario.setCelular(campo[10]);
-//
-//                usuario.Rol = new Rol();
-//                Integer idRol = campo[11] == "" ? null : Integer.parseInt(campo[11]);
-//                usuario.Rol.setIdRol(idRol);
-//
-//                usuario.Direccion = new ArrayList<>();
-//                Direccion direccion = new Direccion();
-//                direccion.setCalle(campo[12]);
-//                direccion.setNumeroExterior(campo[13]);
-//                direccion.setNumeroInterior(campo[14]);
-//
-//                direccion.Colonia = new Colonia();
-//                Integer idColonia = campo[15] == "" ? null : Integer.parseInt(campo[15]);
-//                direccion.Colonia.setIdColonia(idColonia);
-//                usuario.Direccion.add(direccion);
-//
-//                usuarios.add(usuario);
-//            }
-//            return usuarios;
-//        } catch (Exception ex) {
-//            System.out.println("Error");
-//            return null;
-//        }
-//    }
-//
-////    LEE LOS CAMPOS DEL ARCHIVO EXCEL Y LOS DESGLOSA SEGÚN LO NECESARIO PARA AGREGAR AL USUARIO
-//    private List<Usuario> ProcesarExcel(File file) {
-//        List<Usuario> usuarios = new ArrayList<>();
-//        try {
-//            XSSFWorkbook workbook = new XSSFWorkbook(file);
-//            Sheet sheet = workbook.getSheetAt(0);
-//            for (Row row : sheet) {
-//                Usuario usuario = new Usuario();
-//                usuario.setUsername(row.getCell(0) != null ? row.getCell(0).toString() : "");
-//                usuario.setNombre(row.getCell(1) != null ? row.getCell(1).toString() : "");
-//                usuario.setApellidoPaterno(row.getCell(2) != null ? row.getCell(2).toString() : "");
-//                usuario.setApellidoMaterno(row.getCell(3) != null ? row.getCell(3).toString() : "");
-//                SimpleDateFormat format = new SimpleDateFormat();
-//                if (row.getCell(4) != null) {
-//                    if (row.getCell(4).getCellType() == CellType.NUMERIC || DateUtil.isCellDateFormatted(row.getCell(4))) {
-//                        usuario.setFechaNacimiento(row.getCell(4).getDateCellValue());
-//                    } else {
-//                        usuario.setFechaNacimiento(format.parse(row.getCell(4).toString()));
-//                    }
-//                }
-//                usuario.setSexo(row.getCell(5) != null ? row.getCell(5).toString() : "");
-//                usuario.setCurp(row.getCell(6) != null ? row.getCell(6).toString() : "");
-//                usuario.setEmail(row.getCell(7) != null ? row.getCell(7).toString() : "");
-//                usuario.setPassword(row.getCell(8) != null ? row.getCell(8).toString() : "");
-//                DataFormatter dataFormatter = new DataFormatter();
-//                usuario.setTelefono(row.getCell(9) != null ? dataFormatter.formatCellValue(row.getCell(9)) : "");
-//                usuario.setCelular(row.getCell(10) != null ? dataFormatter.formatCellValue(row.getCell(10)) : "");
-//
-//                usuario.Rol = new Rol();
-//                usuario.Rol.setIdRol(row.getCell(11) != null ? (int) row.getCell(11).getNumericCellValue() : 0);
-//
-//                usuario.Direccion = new ArrayList<>();
-//                Direccion direccion = new Direccion();
-//                direccion.setCalle(row.getCell(12) != null ? row.getCell(12).toString() : "");
-//                direccion.setNumeroExterior(row.getCell(13) != null ? dataFormatter.formatCellValue(row.getCell(13)) : "");
-//                direccion.setNumeroInterior(row.getCell(14) != null ? dataFormatter.formatCellValue(row.getCell(14)) : "");
-//
-//                direccion.Colonia = new Colonia();
-//                direccion.Colonia.setIdColonia(row.getCell(15) != null ? (int) row.getCell(15).getNumericCellValue() : 0);
-//                usuario.Direccion.add(direccion);
-//
-//                usuarios.add(usuario);
-//            }
-//            return usuarios;
-//        } catch (Exception ex) {
-//            return null;
-//        }
-//    }
-//
-////    VALIDA QUE LOS CAMPOS DEL ARCHIVO CARGADO SEAN CORRECTOS ANTES DE CARGARLOS A LA BD -----FALTA AGREGAR MÁS VALIDACIONES-----
-//    private List<ErrorCM> ValidarDatos(List<Usuario> usuarios) {
-//        List<ErrorCM> errores = new ArrayList<>();
-//        int linea = 1;
-//        for (Usuario usuario : usuarios) {
-//            if (usuario.getUsername() == null || usuario.getUsername() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getUsername(), "El campo USERNAME es obligatorio"));
-//            }
-//            if (usuario.getNombre() == null || usuario.getNombre() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getNombre(), "El campo NOMBRE es obligatorio"));
-//            }
-//            if (usuario.getApellidoPaterno() == null || usuario.getApellidoPaterno() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getApellidoPaterno(), "El campo APELLIDO PATERNO es obligatorio"));
-//            }
-//            if (usuario.getApellidoMaterno() == null || usuario.getApellidoMaterno() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getApellidoMaterno(), "El campo APELLIDO MATERNO es obligatorio"));
-//            }
-//            if (usuario.getFechaNacimiento() == null || usuario.getFechaNacimiento().equals("")) {
-//                errores.add(new ErrorCM(linea, "fecha vacia", "El campo FECHA DE NACIMIENTO es obligatorio"));
-//            }
-//            if (usuario.getSexo() == null || usuario.getSexo() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getSexo(), "El campo SEXO es obligatorio"));
-//            }
-//            if (usuario.getCurp() == null || usuario.getCurp() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getCurp(), "El campo CURP es obligatorio"));
-//            }
-//            if (usuario.getEmail() == null || usuario.getEmail() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getEmail(), "El campo EMAIL es obligatorio"));
-//            }
-//            if (usuario.getPassword() == null || usuario.getPassword() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getPassword(), "El campo PASSWORD es obligatorio"));
-//            }
-//            if (usuario.getTelefono() == null || usuario.getTelefono() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getTelefono(), "El campo TELEFONO es obligatorio"));
-//            }
-//            if (usuario.getCelular() == null || usuario.getCelular() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getCelular(), "El campo CELULAR es obligatorio"));
-//            }
-//            if (usuario.Rol.getIdRol() <= 0) {
-//                errores.add(new ErrorCM(linea, String.valueOf(usuario.Rol.getIdRol()), "El campo ID ROL debe ser mayor a cero"));
-//            }
-//            if (usuario.Direccion.get(0).getCalle() == null || usuario.Direccion.get(0).getCalle() == "") {
-//                errores.add(new ErrorCM(linea, usuario.getNombre(), "El campo CALLE es obligatorio"));
-//            }
-//            if (usuario.Direccion.get(0).getNumeroExterior() == null || usuario.Direccion.get(0).getNumeroExterior() == "") {
-//                errores.add(new ErrorCM(linea, usuario.Direccion.get(0).getNumeroExterior(), "El campo NÚMERO EXTERIOR es obligatorio"));
-//            }
-//            if (usuario.Direccion.get(0).getNumeroInterior() == null || usuario.Direccion.get(0).getNumeroInterior() == "") {
-//                errores.add(new ErrorCM(linea, usuario.Direccion.get(0).getNumeroInterior(), "El campo NÚMERO INTERIOR es obligatorio"));
-//            }
-//            if (usuario.Direccion.get(0).Colonia.getIdColonia() <= 0) {
-//                errores.add(new ErrorCM(linea, String.valueOf(usuario.Direccion.get(0).Colonia.getIdColonia()), "El campo ID COLONIA debe ser mayor a cero"));
-//            }
-//            linea++;
-//        }
-//        return errores;
-//    }
+//    VISTA PARA LA CARGA MASIVA
+    @GetMapping("cargaMasiva") // localhost:8081/usuario/cargaMasiva
+    public String CargaMasiva() {
+        return "CargaMasiva";
+    }
+
+//    GUARDA Y VALIDA EL ESTADO DEL ARCHIVO GUARDÁNDOLO EN UN LOG
+    @PostMapping("cargamasiva") // localhost:8081/usuario/cargamasiva
+    public String CargaMasiva(@RequestParam("archivo") MultipartFile file, Model model, HttpSession session) {     
+        try 
+        {
+            ByteArrayResource fileAsResource = new ByteArrayResource(file.getBytes()) 
+            {
+                @Override
+                public String getFilename() 
+                {
+                    return file.getOriginalFilename(); // Nombre del archivo para el otro servidor
+                }
+            };
+            
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("archivo", fileAsResource);
+            
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body);
+            ResponseEntity<Result> responseFile = restTemplate.exchange("http://localhost:8080/api/usuario/cargamasiva",
+                                                                                                                                            HttpMethod.POST, requestEntity,
+                                                                                                                               new ParameterizedTypeReference<Result>() {
+                                                                                                                       });
+            Result result = responseFile.getBody();
+            
+            if (responseFile.getStatusCode() == HttpStatusCode.valueOf(200) && result != null) 
+            {
+                if (result.correct)
+                {
+                    // Guardar nombreArchivo en sesión para procesarlo después
+                    Map<String, Object> infoArchivo = (Map<String, Object>) result.object;
+                    String nombreArchivo = (String) infoArchivo.get("nombreArchivo");
+                    session.setAttribute("nombreArchivo", nombreArchivo);
+
+                    model.addAttribute("archivoCorrecto", true);
+                    model.addAttribute("mensaje", result.errorMessage);
+                    model.addAttribute("listaErrores", new ArrayList<>());
+                } else
+                {
+                    // Si hay errores en la validación del backend
+                    model.addAttribute("archivoCorrecto", false);
+                    model.addAttribute("listaErrores", result.object); // Lista de errores
+                    model.addAttribute("mensaje", result.errorMessage);
+                }
+            }
+        } catch (IOException ex) 
+        {
+            model.addAttribute("mensaje", "Error al leer el archivo.");
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            return "CargaMasiva";
+    }
+
+//    MUESTRA LA VISTA PARA PROCESAR EL ARCHIVO UNA VEZ QUE VALIDÓ QUE EL TIPO DE ARCHIVO ERA CORRECTO
+    @GetMapping("cargamasiva/procesar") // localhost:8081/usuario/cargaMasiva/procesar
+    public String CargaMasivaProcesar(HttpSession session, Model model) {
+        
+        Object nombreArchivoObj = session.getAttribute("nombreArchivo");
+        if (nombreArchivoObj == null) 
+        {
+            model.addAttribute("mensaje", "No hay archivo cargado para procesar. Por favor, cargue un archivo primero.");
+            model.addAttribute("archivoCorrecto", false);
+            return "CargaMasiva";
+        }
+        String nombreArchivo = nombreArchivoObj.toString();
+
+        try 
+        {
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("archivo", nombreArchivo);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<Result> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario/cargamasiva/procesar",
+                                                                                                                                                               HttpMethod.POST, requestEntity,
+                                                                                                                                                  new ParameterizedTypeReference<Result>() {
+                                                                                                                           });
+            Result result = responseEntity.getBody();
+
+            if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200) && result != null) 
+            {
+                if (result.correct) 
+                {
+                    model.addAttribute("archivoCorrecto", true);
+                    model.addAttribute("listaErrores", new ArrayList<>());
+                    model.addAttribute("mensaje", result.errorMessage);
+                } else 
+                {
+                    model.addAttribute("archivoCorrecto", false);
+                    model.addAttribute("listaErrores", result.object);
+                    model.addAttribute("mensaje", result.errorMessage);
+                }
+            } 
+
+        }catch (Exception ex) 
+        {
+            model.addAttribute("mensaje", "Error inesperado al procesar el archivo: " + ex.getMessage());
+            model.addAttribute("archivoCorrecto", false);
+        }
+        session.removeAttribute("nombreArchivo");
+        // En lugar de redirigir, regresar la misma vista para mostrar mensajes
+        return "CargaMasiva";
+    }
 }
