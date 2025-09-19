@@ -23,8 +23,10 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javassist.compiler.Javac;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
@@ -70,6 +72,11 @@ public class UsuarioController
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<List<Usuario>>>(){
                                                                                                             });
+        
+        ResponseEntity <Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol", 
+                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
+                                                                                                            new ParameterizedTypeReference<Result<List<Rol>>>(){
+                                                                                                            });
 
         if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200) ) 
         {
@@ -85,9 +92,85 @@ public class UsuarioController
                 model.addAttribute("usuarios", null);
             }
         }
+        if (responseRol.getStatusCode() == HttpStatusCode.valueOf(200)) 
+            {
+                Result resultRol = responseRol.getBody();
+                if(resultRol.correct)
+                {
+                    model.addAttribute("roles", resultRol.object);
+                }else{
+                    model.addAttribute("roles", null);
+                }
+            }
+        
         return "UsuarioIndex";
     }
 
+    @PostMapping()
+    public String Index(Model model, @ModelAttribute("usuarioBusqueda") Usuario usuarioBusqueda)
+    {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity <Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario", 
+                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
+                                                                                                            new ParameterizedTypeReference<Result<List<Usuario>>>(){
+                                                                                                            });
+        
+        ResponseEntity <Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol", 
+                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
+                                                                                                            new ParameterizedTypeReference<Result<List<Rol>>>(){
+                                                                                                            });
+        
+        List<Usuario> resultU = new ArrayList<>();
+        
+        if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200)) 
+        {
+            Result result = responseEntity.getBody();
+                
+            if (result.correct) 
+            {
+                resultU = (List<Usuario>) result.object;
+            } else 
+            {
+                model.addAttribute("usuarios", null);
+            }
+        }
+        if (responseRol.getStatusCode() == HttpStatusCode.valueOf(200)) 
+            {
+                Result resultRol = responseRol.getBody();
+                if(resultRol.correct)
+                {
+                    model.addAttribute("roles", resultRol.object);
+                }else{
+                    model.addAttribute("roles", null);
+                }
+            }
+        
+        if(usuarioBusqueda.getNombre() != null && !usuarioBusqueda.getNombre().isBlank())
+        {
+            resultU = resultU.stream().filter(usuario -> usuario.getNombre() != null && usuario.getNombre().toLowerCase().contains(usuarioBusqueda.getNombre().toLowerCase())).collect(Collectors.toList());
+        }
+        
+        if(usuarioBusqueda.getApellidoPaterno() != null && !usuarioBusqueda.getApellidoPaterno().isBlank())
+        {
+            resultU = resultU.stream().filter(usuario -> usuario.getApellidoPaterno() != null && usuario.getApellidoPaterno().toLowerCase().contains(usuarioBusqueda.getApellidoPaterno().toLowerCase())).collect(Collectors.toList());
+        }
+        
+        if(usuarioBusqueda.getApellidoMaterno() != null && !usuarioBusqueda.getApellidoMaterno().isBlank())
+        {
+            resultU = resultU.stream().filter(usuario -> usuario.getApellidoMaterno() != null && usuario.getApellidoMaterno().toLowerCase().contains(usuarioBusqueda.getApellidoMaterno().toLowerCase())).collect(Collectors.toList());
+        }
+        
+        if(usuarioBusqueda.getRol() != null && usuarioBusqueda.getRol().getIdRol() > 0)
+        {
+            int idRolBuscado = usuarioBusqueda.getRol().getIdRol();
+            resultU = resultU.stream().filter(usuario -> usuario.getRol() != null && usuario.getRol().getIdRol() == idRolBuscado).collect(Collectors.toList());
+        }
+        
+        model.addAttribute("usuarioBusqueda", usuarioBusqueda);
+        model.addAttribute("usuarios", resultU);
+         return "UsuarioIndex";
+    }
+    
 //    VISTA QUE MUESTRA UsuarioDetail (si el usuario existe) o UsuarioForm (si el usuario no existe) 
 //    UsuarioGetById
     @GetMapping("/action/{IdUsuario}") // localhost:8081/usuario/action/{idUsuario}
