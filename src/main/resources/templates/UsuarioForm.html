@@ -239,80 +239,7 @@
                 {
                     document.getElementById("userForm").submit();
                 }
-            }
-
-//            $(document).ready(function(){
-//                $.ajax(
-//                        {
-//                            type: "GET",
-//                            dataType: 'json',
-//                            success: function (data, textStatus, jqXHR)
-//                            {
-//                                if (data.correct)
-//                                {
-//                                    $.each(data.object, function (indice, estado)
-//                                    {
-//                                        $("#estadoddl").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>");
-//                                    });
-//                                } else
-//                                {
-//                                    console.log("No hay datos");
-//                                }
-//                            }, error: function (jqXHR, textStatus, errorThrown)
-//                            {
-//                                alert("Algo ha salido mal.");
-//                            }
-//                        });
-//                        
-//                $.ajax(
-//                        {
-//                            type: "GET",
-//                            url: "http://127.0.0.1:8080/api/municipio",
-//                            contentType: "application/json",
-//                            dataType: "json",
-//                            success: function (data, textStatus, jqXHR)
-//                            {
-//                                if (data.correct)
-//                                {
-//                                    $.each(data.object, function (indice, municipio)
-//                                    {
-//                                        $("#municipioddl").append("<option value=" + municipio.idMunicipio + ">" + municipio.nombre + "</option>");
-//                                    });
-//                                } else
-//                                {
-//                                    console.log("No hay datos");
-//                                }
-//                            }, error: function (textStatus, jqXHR, errorThrown)
-//                            {
-//                                alert("Algo ha salido mal.");
-//                            }
-//                        });
-//                    
-//                 $.ajax(
-//                         {
-//                             type: "GET",
-//                             url: "http://127.0.0.1:8080/api/colonia",
-//                             contentType: "application/json",
-//                             dataType: "json",
-//                             success: function (data, textStatus, jqXHR)
-//                             {
-//                                 if (data.correct)
-//                                 {
-//                                     $.each(data.object, function (indice, colonia)
-//                                     {
-//                                         $("#coloniaddl").append("<option value=" + colonia.idColonia + ">" + colonia.nombre + "</option>");
-//                                     });
-//                                 } else
-//                                 {
-//                                     console.log("No hay datos");
-//                                 }
-//                             }, error: function (textStatus, jqXHR, errorThrown)
-//                             {
-//                                 alert("Algo ha salido mal.");
-//                             }
-//                         });
-//                     });
-//            
+            }       
 
             $(document).ready(function ()
             {
@@ -334,6 +261,7 @@
                                         $("#municipioddl").append("<option value=0 selected>Selecciona un municipio</option>");
                                         $("#coloniaddl").empty();
                                         $("#coloniaddl").append("<option value=0 selected>Selecciona una colonia</option>");
+                                        console.log("Respuesta del servidor:", data.object);
                                         $.each(data.object, function (indice, estado)
                                         {
                                             $("#estadoddl").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>");
