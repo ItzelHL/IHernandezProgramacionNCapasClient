@@ -566,7 +566,7 @@ public class UsuarioController
 
 ////    <-------------------------------------------------------- C A R G A   M A S I V A -------------------------------------------------------->
 //    VISTA PARA LA CARGA MASIVA
-    @GetMapping("cargaMasiva") // localhost:8081/usuario/cargaMasiva
+    @GetMapping("cargamasiva") // localhost:8081/usuario/cargaMasiva
     public String CargaMasiva() {
         return "CargaMasiva";
     }

@@ -2,23 +2,30 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 
-    <body layout:fragment="body" style="background-color: #181818; color: whitesmoke">
-        <div class="container-xxl bd-gutter pt-md-1 pb-md-4">
+    <section layout:fragment="body" style="background-color: #2B3035;">
+        <div class="container text-white">
+            
+            <!-- Título -->
             <div class="row g-3">
                 <div class="col-xl-8">
                     <h1 class="bd-title mt-0">Insertar formulario</h1>
                     <h5>Para realizar una carga masiva, primero debe seleccionar el tipo de archivo que desea subir.</h5>
+                    <!-- Botón Elegir formulario -->
                     <div class="d-flex flex-column flex-md-row gap-3">
                         <button id="insertarFormulario" class="btn btn-primary btn-lg" onclick="elegirFormulario()">Elegir tipo de formulario</button>
                     </div>
                 </div>
             </div>
+            
+            <!-- Botones para cargar Excel o TXT -->
             <div id="botones" class="row" style="display:none">
                 <div class="btn-group">
                     <button class="btn btn-success btn-lg col-4" id="btnExcel">Excel</button>
                     <button class="btn btn-primary btn-lg col-4" id="btnTxt">TXT</button>
                 </div>
             </div>
+            
+            <!-- Botón subir archivo -->
             <br>
             <div class="row g-3" id="formularioArchivo" style="display: none">
                 <form action="/usuario/cargamasiva" method="post" enctype="multipart/form-data">
@@ -26,20 +33,31 @@
                     <button type="submit" class="btn btn-success btn-lg" id="cargaMasiva">Subir archivo</button>
                 </form>
             </div>
+            
+            <!-- Vista post carga masiva -->
             <p th:if="${mensaje}" th:text="${mensaje}"></p>
             <div th:if="${archivoCorrecto != null}">
+                
+                <!-- Si el archivo se cargó correctamente, muestra botón Procesar archivo -->
                 <div th:if="${listaErrores != null and #lists.isEmpty(listaErrores)}">
                     <h4>Archivo correcto: </h4>
                     <a th:href="@{/usuario/cargamasiva/procesar}" class="btn btn-success btn-lg">Procesar archivo</a>
                 </div>
+                
+                <!-- Si el archivo contiene errores muestra una tabla que contiene los errores-->
                 <div th:if="${listaErrores != null and !#lists.isEmpty(listaErrores)}">
                     <h4>Archivo incorrecto: </h4>
-                    <table class="table">
-                        <thead class="table-dark">
-                        <th class="col-2">Línea</th>
-                        <th>Texto</th>
-                        <th>Error</th>
+                    
+                    <table class = "table table-hover table-striped-columns">
+                        
+                        <thead>
+                            <tr class = "table table-dark" style="text-align: center">
+                                <th class="col-2">Línea</th>
+                                <th>Texto</th>
+                                <th>Error</th>
+                            </tr>
                         </thead>
+                        
                         <tbody>
                             <tr th:each="error : ${listaErrores}">
                                 <td th:text="${error.linea}"></td>
@@ -47,12 +65,12 @@
                                 <td th:text="${error.mensaje}"></td>
                             </tr>
                         </tbody>
+                        
                     </table>
+                    
                 </div>
             </div>
-
         </div>
-
         <script>
             function elegirFormulario()
             {
@@ -96,6 +114,5 @@
                 }
             });
         </script>
-
-    </body>
+    </section>
 </html>
