@@ -602,8 +602,8 @@ public class UsuarioController
                 {
                     // Guardar nombreArchivo en sesión para procesarlo después
                     Map<String, Object> infoArchivo = (Map<String, Object>) result.object;
-                    String nombreArchivo = (String) infoArchivo.get("nombreArchivo");
-                    session.setAttribute("nombreArchivo", nombreArchivo);
+                    String rutaCifrada = (String) infoArchivo.get("rutaCifrada");
+                    session.setAttribute("rutaCifrada", rutaCifrada);
 
                     model.addAttribute("archivoCorrecto", true);
                     model.addAttribute("mensaje", result.errorMessage);
@@ -628,19 +628,19 @@ public class UsuarioController
     @GetMapping("cargamasiva/procesar") // localhost:8081/usuario/cargaMasiva/procesar
     public String CargaMasivaProcesar(HttpSession session, Model model) {
         
-        Object nombreArchivoObj = session.getAttribute("nombreArchivo");
-        if (nombreArchivoObj == null) 
+        Object rutaCifradaObj = session.getAttribute("rutaCifrada");
+        if (rutaCifradaObj == null) 
         {
             model.addAttribute("mensaje", "No hay archivo cargado para procesar. Por favor, cargue un archivo primero.");
             model.addAttribute("archivoCorrecto", false);
             return "CargaMasiva";
         }
-        String nombreArchivo = nombreArchivoObj.toString();
+        String rutaCifrada = rutaCifradaObj.toString();
 
         try 
         {
             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-            body.add("archivo", nombreArchivo);
+            body.add("rutaCifrada", rutaCifrada);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -673,7 +673,7 @@ public class UsuarioController
             model.addAttribute("mensaje", "Error inesperado al procesar el archivo: " + ex.getMessage());
             model.addAttribute("archivoCorrecto", false);
         }
-        session.removeAttribute("nombreArchivo");
+        session.removeAttribute("rutaCifrada");
         // En lugar de redirigir, regresar la misma vista para mostrar mensajes
         return "CargaMasiva";
     }
