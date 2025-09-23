@@ -26,9 +26,9 @@
                         <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4" style="align-items: center">
                             <input type="file" id="imagenUsuario" class="form-control" name="imagenFile" required><img id="previewImage" style="max-width: 200px; max-height: auto" class="rounded mx-auto d-block" th:field="*{Imagen}" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|">
                         </div>
-                    </div>           
-                    <div class="row g-3" style="background-color: activeborder">
-                        
+                    </div>
+                    
+                    <div class="row g-3" style="background-color: activeborder">     
                         <!-- Username -->
                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2">
                             <label for="username" class="form-label">Username</label>
@@ -66,6 +66,7 @@
                             <input type="date" id="fechaNacimiento" class="form-control" th:field="*{FechaNacimiento}" required>
                             <span class="text-danger" th:if="${#fields.hasErrors('FechaNacimiento')}" th:errors="*{FechaNacimiento}">Message error</span>
                         </div>
+                        
                         <!-- Sexo -->
                         <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <fieldset required>
@@ -81,6 +82,7 @@
                             </fieldset>
                             <span class="text-danger" th:if="${#fields.hasErrors('Sexo')}" th:errors="*{Sexo}">Message error</span>
                         </div>
+                        
                         <!-- CURP -->
                         <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4">
                             <label for="curp" class="form-label">CURP</label>
