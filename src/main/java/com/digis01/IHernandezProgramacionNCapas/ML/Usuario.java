@@ -2,7 +2,6 @@ package com.digis01.IHernandezProgramacionNCapas.ML;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 

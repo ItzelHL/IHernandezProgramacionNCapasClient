@@ -1,6 +1,7 @@
 package com.digis01.IHernandezProgramacionNCapas.ML;
 
-public class Municipio {
+public class Municipio 
+{
     private int IdMunicipio;
     private String Nombre;
     public Estado Estado;
