@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -43,15 +44,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("usuario")
 public class UsuarioController 
 {
+    private final RestTemplate restTemplate;
+    
+    public UsuarioController(RestTemplate restTemplate)
+    {
+        this.restTemplate = restTemplate;
+    }
 
 //    <---------------------------------------------- V I S T A S   P A R A   U S U A R I O ---------------------------------------------->
 //    VISTA PARA INDEX 
 //    UsuarioDireccionGetAll
     @GetMapping // localhost:8081/usuario
-    public String Index(Model model) 
+    public String Index(Model model, HttpSession session) 
     {
-        
-        RestTemplate restTemplate = new RestTemplate();
         
         ResponseEntity <Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario", 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 

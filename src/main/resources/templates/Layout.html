@@ -1,5 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <title>Usuario</title>
         <meta charset="UTF-8">
@@ -113,14 +114,18 @@
                     </ul>
                     
                     <!-- Área derecha / búsqueda-->
-<!--                    <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-                        <div class="input-group input-group-merge">
-                            <input class="form-control form-control-dark" type="search" placeholder="Search" aria-label="Search"/>
-                            <button id="search" aria-label="search" title="search" class="btn btn-success" type="submit">
-                                <i class="bi bi-search"></i>
-                            </button>
+                    <form th:if="${session.jwtToken != null}" th:action="@{/login/logout}" method="post" class="d-inline">
+                        <!-- Botón Logout -->
+                        <button type="submit" class="btn btn-outline-light me-2">Logout</button>
+                    </form>
+
+                    <form th:if="${session.jwtToken == null}" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+                        <!-- Botón LogIn -->
+                        <div>
+                            <!-- Solo se muestra si no hay sesión -->
+                            <a class="btn btn-outline-light me-2" th:href="@{/login}">Login</a>
                         </div>
-                    </form>-->
+                    </form>
 
                 </div>
             </div>
