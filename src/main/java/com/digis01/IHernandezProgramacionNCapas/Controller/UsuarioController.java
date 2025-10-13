@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -57,49 +56,59 @@ public class UsuarioController
     @GetMapping // localhost:8081/usuario
     public String Index(Model model, HttpSession session) 
     {
-        
-        ResponseEntity <Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario", 
-                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
-                                                                                                            new ParameterizedTypeReference<Result<List<Usuario>>>(){
-                                                                                                            });
-        
-        ResponseEntity <Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol", 
-                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
-                                                                                                            new ParameterizedTypeReference<Result<List<Rol>>>(){
-                                                                                                            });
+        String rol = (String) session.getAttribute("userRole");
+        String usernameSession = (String) session.getAttribute("username");
 
-        if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200) ) 
+        ResponseEntity<Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol",
+                                                                                                                            HttpMethod.GET, HttpEntity.EMPTY,
+                                                                                                                            new ParameterizedTypeReference<Result<List<Rol>>>() {});
+        if (responseRol.getStatusCode() == HttpStatusCode.valueOf(200)) 
         {
-            model.addAttribute("usuarioBusqueda", new Usuario());
-            
-            Result result = responseEntity.getBody();
-                
-            if (result.correct) 
+            Result<List<Rol>> resultRol = responseRol.getBody();
+            model.addAttribute("roles", (resultRol != null && resultRol.correct) ? resultRol.object : new ArrayList<>());
+        } else 
+        {
+            model.addAttribute("roles", new ArrayList<>());
+        }
+
+        ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario",
+                                                                                                                           HttpMethod.GET, HttpEntity.EMPTY,
+                                                                                                                   new ParameterizedTypeReference<Result<List<Usuario>>>() {});
+
+        List<Usuario> listaUsuarios = new ArrayList<>();
+
+        if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200)) 
+        {
+            Result<List<Usuario>> result = responseEntity.getBody();
+
+            if (result != null && result.correct && result.object != null) 
             {
-                model.addAttribute("usuarios", result.object);
-            } else 
-            {
-                model.addAttribute("usuarios", null);
+                listaUsuarios = result.object;
             }
         }
-        if (responseRol.getStatusCode() == HttpStatusCode.valueOf(200)) 
-            {
-                Result resultRol = responseRol.getBody();
-                if(resultRol.correct)
-                {
-                    model.addAttribute("roles", resultRol.object);
-                }else{
-                    model.addAttribute("roles", null);
-                }
-            }
-        
+
+        if (rol != null && (rol.equals("Lector") || rol.equals("Invitado"))) 
+        {
+            listaUsuarios = listaUsuarios.stream()
+                    .filter(user -> user.getUsername().equals(usernameSession))
+                    .toList();
+        }
+
+        model.addAttribute("usuarios", listaUsuarios);
+        model.addAttribute("usuarioBusqueda", new Usuario());
+
         return "UsuarioIndex";
     }
 
     @PostMapping()
-    public String Index(Model model, @ModelAttribute("usuarioBusqueda") Usuario usuarioBusqueda)
+    public String Index(Model model, @ModelAttribute("usuarioBusqueda") Usuario usuarioBusqueda, HttpSession session)
     {
-        RestTemplate restTemplate = new RestTemplate();
+        String rol = (String) session.getAttribute("userRole");
+        if (rol.equals("Lector") || rol.equals("Invitado")) 
+        {
+            return "redirect:/usuario";
+        }
+        
         ResponseEntity <Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario", 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<List<Usuario>>>(){
@@ -164,13 +173,13 @@ public class UsuarioController
 //    VISTA QUE MUESTRA UsuarioDetail (si el usuario existe) o UsuarioForm (si el usuario no existe) 
 //    UsuarioGetById
     @GetMapping("/action/{IdUsuario}") // localhost:8081/usuario/action/{idUsuario}
-    public String Add(Model model, @PathVariable("IdUsuario") int IdUsuario, @RequestParam(required = false) Integer IdPais) {
+    public String Add(Model model, @PathVariable("IdUsuario") int IdUsuario, @RequestParam(required = false) Integer IdPais) 
+    {
         if (IdUsuario == 0) //usuario no existe - Muestra el UsuarioForm.html - AGREGAR USUARIO
         {
             Usuario usuario = new Usuario();
             model.addAttribute("usuario", usuario);
             
-            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity <Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol", 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<List<Rol>>>(){
@@ -204,7 +213,6 @@ public class UsuarioController
             
         } else // IdUsuario > 0 // usuario si existe - muestra UsuarioDetail.html - VISTA USUARIO DETAIL
         {
-            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity <Result<Usuario>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario/action/" + IdUsuario, 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<Usuario>>(){
@@ -230,7 +238,6 @@ public class UsuarioController
 //    VISTA Y MÉTODO PARA RETORNAR LUEGO DE ELIMINAR UN USUARIO
     @GetMapping("delete/{IdUsuario}")
     public String Delete(@PathVariable("IdUsuario") int IdUsuario, Model model) {
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Result<Usuario>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario/" + IdUsuario,
                                                                                                                                 HttpMethod.DELETE, HttpEntity.EMPTY,
                                                                                                                                 new ParameterizedTypeReference<Result<Usuario>>() {
@@ -260,7 +267,6 @@ public class UsuarioController
                                                 Model model) {
         if (IdDireccion == null) // Vista para editar usuario // IdUsuario > 0 && IdDireccion == -1
         {
-            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity <Result<Usuario>> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario/action/" + IdUsuario, 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<Usuario>>(){
@@ -273,8 +279,8 @@ public class UsuarioController
             {
                 Result result = responseEntity.getBody();
                 Usuario usuario = (Usuario) result.object;
-                usuario.Direccion = new ArrayList<>();
-                usuario.Direccion.add(new Direccion(-1));
+                usuario.Direcciones = new ArrayList<>();
+                usuario.Direcciones.add(new Direccion(-1));
 
                 if (result.correct) 
                 {
@@ -307,7 +313,6 @@ public class UsuarioController
             Direccion direccion = new Direccion();
             model.addAttribute("direccion", direccion);
             
-            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity <Result<List<Pais>>> responsePais = restTemplate.exchange("http://localhost:8080/api/pais", 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<List<Pais>>>(){
@@ -339,10 +344,9 @@ public class UsuarioController
             return "UsuarioForm";
         } else 
         {
-            if (usuario.getIdUsuario() == 0 && usuario.Direccion.get(0).getIdDireccion() == 0) // Agregar Usuario y direccion
+            if (usuario.getIdUsuario() == 0 && usuario.Direcciones.get(0).getIdDireccion() == 0) // Agregar Usuario y direccion
             {
                 usuario.setImagen(validarImagen(imagen));
-                RestTemplate restTemplate = new RestTemplate();
                 HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
                 ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/usuario/add",
                                                                                                                                                      HttpMethod.POST, entity,
@@ -362,10 +366,9 @@ public class UsuarioController
                     }
                 }
                 return "redirect:/usuario";
-            } else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() == -1) // Editar usuario
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direcciones.get(0).getIdDireccion() == -1) // Editar usuario
             {
                 usuario.setImagen(validarImagen(imagen));
-                RestTemplate restTemplate = new RestTemplate();
                 HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
                 ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/usuario/" + usuario.getIdUsuario(),
                                                                                                                                                         HttpMethod.PUT, entity,
@@ -385,10 +388,9 @@ public class UsuarioController
                     }
                 }
                 return "redirect:/usuario/action/" + usuario.getIdUsuario();
-            } else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() == 0) // Agregar dirección
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direcciones.get(0).getIdDireccion() == 0) // Agregar dirección
             {
-                RestTemplate restTemplate = new RestTemplate();
-                HttpEntity<Direccion> entity = new HttpEntity<>(usuario.Direccion.get(0));
+                HttpEntity<Direccion> entity = new HttpEntity<>(usuario.Direcciones.get(0));
                 ResponseEntity<Result<Direccion>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/direccion/add/" + usuario.getIdUsuario(),
                                                                                                                                                     HttpMethod.POST, entity,
                                                                                                                         new ParameterizedTypeReference<Result<Direccion>>() {
@@ -406,14 +408,13 @@ public class UsuarioController
                     }
                     return "redirect:/usuario/action/" + usuario.getIdUsuario();
                 }
-            } else if (usuario.getIdUsuario() > 0 && usuario.Direccion.get(0).getIdDireccion() > 0) // Editar dirección
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direcciones.get(0).getIdDireccion() > 0) // Editar dirección
             {
                 Direccion direccion = new Direccion();
                 model.addAttribute("direccion", direccion);
 
-                RestTemplate restTemplate = new RestTemplate();
-                HttpEntity<Direccion> entity = new HttpEntity<>(usuario.Direccion.get(0));
-                ResponseEntity<Result<Direccion>> responseEntity = restTemplate.exchange("http://localhost:8080/api/direccion/" + usuario.getIdUsuario() +"/direccion/" + usuario.Direccion.get(0).getIdDireccion(),
+                HttpEntity<Direccion> entity = new HttpEntity<>(usuario.Direcciones.get(0));
+                ResponseEntity<Result<Direccion>> responseEntity = restTemplate.exchange("http://localhost:8080/api/direccion/" + usuario.getIdUsuario() +"/direccion/" + usuario.Direcciones.get(0).getIdDireccion(),
                                                                                                             HttpMethod.PUT, entity,
                                                                                                                             new ParameterizedTypeReference<Result<Direccion>>() {
                                                                                                                     });
@@ -441,7 +442,6 @@ public class UsuarioController
     public String Update(@RequestParam("IdDireccion") int IdDireccion, @RequestParam("IdUsuario") int IdUsuario, Model model){
        if (IdDireccion > 0) // Vista para editar direccion - Muestra el UsuarioForm.html
         {     
-            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity <Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8080/api/direccion/detail/" + IdDireccion, 
                                                                                                             HttpMethod.GET, HttpEntity.EMPTY, 
                                                                                                             new ParameterizedTypeReference<Result<Direccion>>(){
@@ -464,8 +464,8 @@ public class UsuarioController
                     direccion.Usuario = usuario;
                     direccion.Usuario.setIdUsuario(IdUsuario);
                     
-                    usuario.Direccion = new ArrayList<>();
-                    usuario.Direccion.add(direccion);
+                    usuario.Direcciones = new ArrayList<>();
+                    usuario.Direcciones.add(direccion);
                     model.addAttribute("usuario", usuario);
                 } else 
                 {
@@ -506,7 +506,6 @@ public class UsuarioController
         direccion.Usuario = new Usuario();
         direccion.Usuario.setIdUsuario(IdUsuario);
         
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Result<Direccion>> responseEntity = restTemplate.exchange("http://localhost:8080/api/direccion/" + IdDireccion,
                                                                                                                                 HttpMethod.DELETE, HttpEntity.EMPTY,
                                                                                                                                 new ParameterizedTypeReference<Result<Direccion>>() {
@@ -578,7 +577,6 @@ public class UsuarioController
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("archivo", fileAsResource);
             
-            RestTemplate restTemplate = new RestTemplate();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body);
             ResponseEntity<Result> responseFile = restTemplate.exchange("http://localhost:8080/api/usuario/cargamasiva",
                                                                                                                                             HttpMethod.POST, requestEntity,
@@ -635,7 +633,6 @@ public class UsuarioController
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            RestTemplate restTemplate = new RestTemplate();
             HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<Result> responseEntity = restTemplate.exchange("http://localhost:8080/api/usuario/cargamasiva/procesar",
                                                                                                                                                                HttpMethod.POST, requestEntity,

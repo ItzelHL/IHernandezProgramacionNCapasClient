@@ -101,8 +101,10 @@
                                 Index
                             </a>
                         </li>
-                        <li><a class="nav-link px-2 text-white" href="/usuario/cargamasiva">Carga masiva</a></li>
-                        <li>
+                        <li th:if="${session.userRole == 'Administrador'}">
+                            <a class="nav-link px-2 text-white" href="/usuario/cargamasiva">Carga masiva</a>
+                        </li>
+<!--                        <li>
                             <a class="nav-link text-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Prueba2</a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#">Action</a></li>
@@ -110,16 +112,20 @@
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#">Something else here</a></li>
                             </ul>
-                        </li>
+                        </li>-->
                     </ul>
                     
                     <!-- Área derecha / búsqueda-->
-                    <form th:if="${session.jwtToken != null}" th:action="@{/login/logout}" method="post" class="d-inline">
+                    <form th:if="${session.token != null}" th:action="@{/login/logout}" method="post" class="d-inline">
+                        <div th:if="${session.nombre != null}" class="text-white d-inline me-3">
+                            Bienvenido(a), <span th:text="${session.nombre}">Usuario</span>
+                        </div>
+                        
                         <!-- Botón Logout -->
-                        <button type="submit" class="btn btn-outline-light me-2">Logout</button>
+                        <button type="submit" class="btn btn-outline-light ms-3">Logout</button>
                     </form>
 
-                    <form th:if="${session.jwtToken == null}" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+                    <form th:if="${session.token == null}" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
                         <!-- Botón LogIn -->
                         <div>
                             <!-- Solo se muestra si no hay sesión -->
@@ -137,10 +143,10 @@
         </main>
 
         <footer class="bg-dark text-white text-center py-3 mt-auto">
-            <div class="container" style="font-family: Arial, sans-serif; font-size: 20px">
+            <div class="container" style="font-family: Arial, sans-serif; font-size: 15px">
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3">
                     <li class="nav-item"><a class="nav-link px-2 text-white" href="/usuario">Home</a></li>
-                    <li class="nav-item"><a class="nav-link px-2 text-white" href="/usuario/cargamasiva">Carga masiva</a></li>
+                    <li th:if="${session.userRole == 'Administrador'}" class="nav-item"><a class="nav-link px-2 text-white" href="/usuario/cargamasiva">Carga masiva</a></li>
                     <li class="nav-item"><a class="nav-link px-2 text-white" href="#">Prueba2</a></li>
                 </ul>
                 <p class="mb-0">Itzel Hernández Luna © 2025</p>

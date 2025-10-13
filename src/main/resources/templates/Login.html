@@ -1,81 +1,384 @@
 <html xmlns:th="http://www.thymeleaf.org"
-          xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-          layout:decorate="~{layout}">
-    
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
     <section layout:fragment="body" style="background-color: #2B3035;">
         <div class="container">
             
-            <form method="post" th:action="@{/login}" style="padding-top: 10px;">             
+            <!-- FORMULARIO LOGIN -->
+            <form method="post" th:action="@{/login}" style="padding-top: 10px;">
                 <div class="row d-flex align-items-center justify-content-center">
                     <!-- Mensaje de logout -->
                     <div id="logoutMessage" th:if="${logout}" th:text="${logout}" class="alert alert-success text-center fs-5" role="alert"></div>
-                    
+
                     <!-- Mensaje de error -->
                     <div id="errorMessage" th:if="${error}" th:text="${error}" class="alert alert-danger text-center fs-5" role="alert"></div>
                 </div>
 
                 <div class="row d-flex align-items-center justify-content-center">
-
-                    <!-- Imagen izquierda de Login -->
+                    <!-- Imagen izquierda -->
                     <div class="col-md-8 col-lg-7 col-xl-6">
-                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-                             class="img-fluid" alt="Phone image">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg" class="img-fluid" alt="Phone image">
                     </div>
 
+                    <!-- FORMULARIO DE LOGIN -->
                     <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+
+                        <h4 class="mb-3 text-align-center text-white">INICIA SESIÓN</h4>
+                        
                         <!-- Username -->
-                        <div data-mdb-input-init class="form-outline mb-4">
+                        <div class="form-outline mb-4">
                             <label class="form-label text-white" for="formUsername">Username</label>
-                            <input type="text" id="formUsername" name="username" class="form-control form-control-lg" />
+                            <input type="text" id="formUsername" name="username" class="form-control form-control-lg" required/>
                         </div>
 
                         <!-- Password -->
-                        <div data-mdb-input-init class="form-outline mb-4">
+                        <div class="form-outline mb-4">
                             <label class="form-label text-white" for="formPassword">Password</label>
-                            <input type="password" id="formPassword" name="password" class="form-control form-control-lg" />
+                            <input type="password" id="formPassword" name="password" class="form-control form-control-lg" required/>
                         </div>
 
+                        <!-- Botón login -->
                         <div class="d-flex justify-content-around align-items-center mb-4">
-                            <!-- Remember me sin funcionar -->
-                            <div class="form-check">
-                                <label class="form-check-label text-white" for="form1Example3"> Remember me </label>
-                                <input class="form-check-input" type="checkbox" value="" id="form1Example3" checked />
-                            </div>
-                            <!-- Olvidó su contraseña? -->
-                            <a href="#!">Forgot password?</a>
-                        </div>
-
-                        <div class="d-flex justify-content-around align-items-center mb-4">
-                            <!-- Botón Sign in -->
                             <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in</button>
                         </div>
+
+                        <hr style="border-color: white">
+
+                        <!-- Enlace de registro -->
+                        <div class="signup-link text-white"> No estás registrado? </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal"> Regístrate </button>
                     </div>
                 </div>
-            </form>
+            </form><!-- FIN LOGIN FORM -->
 
+            <!-- MODAL DE REGISTRO -->
+            <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="signupModalLabel">Registro de usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <!-- FORMULARIO DE REGISTRO -->
+                        <form id="signupForm" method="post" th:action="@{/login/signup}" th:object="${usuario}">
+                            
+                            <div class="modal-body">
+
+                                <!-- DATOS GENERALES -->
+                                <h4 class="mb-3">Datos generales</h4>
+                                <div class="row g-3">
+                                    
+                                    <!-- Username -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Username</label>
+                                        <input th:field="*{username}" class="form-control" placeholder="Username" required>
+                                    </div>
+                                    
+                                    <!-- Nombre -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nombre</label>
+                                        <input th:field="*{nombre}" class="form-control" placeholder="Nombre" required>
+                                    </div>
+                                    
+                                    <!-- Apellido paterno -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Apellido paterno</label>
+                                        <input th:field="*{apellidoPaterno}" class="form-control" placeholder="Apellido paterno" required>
+                                    </div>
+                                    
+                                    <!-- Apellido materno -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Apellido materno</label>
+                                        <input th:field="*{apellidoMaterno}" class="form-control" placeholder="Apellido materno" required>
+                                    </div>
+                                    
+                                    <!-- Fecha de nacimiento -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Fecha de nacimiento</label>
+                                        <input type="date" th:field="*{fechaNacimiento}" class="form-control" required>
+                                    </div>
+                                    
+                                    <!-- Sexo -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Sexo</label>
+                                        <div>
+                                            <label>
+                                                <input type="radio" th:field="*{sexo}" value="F" checked> Femenino
+                                            </label>
+                                            <label class="ms-3">
+                                                <input type="radio" th:field="*{sexo}" value="M"> Masculino
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Curp -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">CURP</label>
+                                        <input th:field="*{curp}" class="form-control" placeholder="CURP" required>
+                                    </div>
+                                    
+                                    <!-- Email -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Email</label>
+                                        <input th:field="*{email}" type="email" class="form-control" placeholder="example@example.com" required>
+                                    </div>
+                                    
+                                    <!-- Password -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Password</label>
+                                        <input th:field="*{password}" type="password" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Confirmar Password</label>
+                                        <input id="confirmPassword" type="password" class="form-control" required>
+                                    </div>
+                                    
+                                    <!-- Teléfono -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Teléfono</label>
+                                        <input th:field="*{telefono}" class="form-control" placeholder="1122334455" required>
+                                    </div>
+                                    
+                                    <!-- Celular -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Celular</label>
+                                        <input th:field="*{celular}" class="form-control" placeholder="1122334455" required>
+                                    </div>
+                                    
+                                    <!-- Rol -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Rol</label>
+                                        <select class="form-select" th:field="*{rol.idRol}">
+                                            <option value="0" selected>Selecciona un rol</option>
+                                            <option th:each="rol : ${roles}"  th:if="${rol.nombre != 'Administrador'}" th:value="${rol.idRol}" th:text="${rol.nombre}">Rol</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- DIRECCIÓN -->
+                                <hr class="my-4">
+                                <h4 class="mb-3">Dirección</h4>
+                                <div class="row g-3">
+                                    
+                                    <!-- País -->
+                                    <div class="col-md-3">
+                                        <label for="paisddl" class="form-label">País</label>
+                                        <select id="paisddl" class="form-select" th:field="*{Direccion[0].Colonia.Municipio.Estado.Pais.IdPais}">
+                                            <option value="0" selected>Selecciona un país</option>
+                                            <option th:each="pais : ${paises}" th:value="${pais.idPais}" th:text="${pais.nombre}"></option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Estado -->
+                                    <div class="col-md-3">
+                                        <label for="estadoddl" class="form-label">Estado</label>
+                                        <select id="estadoddl" class="form-select" th:field="*{Direccion[0].Colonia.Municipio.Estado.IdEstado}">
+                                            <option value="0" selected>Selecciona un estado</option>
+                                            <option th:each="estado : ${estados}" th:value="${estado.idEstado}" th:text="${estado.nombre}"></option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Municipio -->
+                                    <div class="col-md-3">
+                                        <label for="municipioddl" class="form-label">Municipio</label>
+                                        <select id="municipioddl" class="form-select" th:field="*{Direccion[0].Colonia.Municipio.idMunicipio}">
+                                            <option value="0" selected>Selecciona un municipio</option>
+                                            <option th:each="municipio : ${municipios}" th:value="${municipio.idMunicipio}" th:text="${municipio.nombre}"></option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Colonia -->
+                                    <div class="col-md-3">
+                                        <label for="coloniaddl" class="form-label">Colonia</label>
+                                        <select id="coloniaddl" class="form-select" th:field="*{Direccion[0].Colonia.IdColonia}">
+                                            <option value="0" selected>Selecciona una colonia</option>
+                                            <option th:each="colonia : ${colonias}" th:value="${colonia.idColonia}" th:text="${colonia.nombre}"></option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Código postal -->
+                                    <div class="col-md-3">
+                                        <label for="codigoPostal" class="form-label">Código Postal</label>
+                                        <input id="codigoPostal" th:field="*{Direccion[0].Colonia.codigoPostal}" type="text" class="form-control" placeholder="Código Postal" disabled>
+                                    </div>
+                                    
+                                    <!-- Calle -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Calle</label>
+                                        <input th:field="*{Direccion[0].Calle}" class="form-control" placeholder="Calle" required>
+                                    </div>
+                                    
+                                    <!-- Número exterior -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Número exterior</label>
+                                        <input th:field="*{Direccion[0].NumeroExterior}" class="form-control" placeholder="Número exterior" required>
+                                    </div>
+                                    
+                                    <!-- Número interior -->
+                                    <div class="col-md-3">
+                                        <label class="form-label">Número interior</label>
+                                        <input th:field="*{Direccion[0].NumeroInterior}" class="form-control" placeholder="Número interior">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Registrarse</button>
+                            </div>
+                        </form> <!-- FIN FORMULARIO REGISTRO -->
+                    </div>
+                </div>
+            </div> <!-- FIN MODAL -->
         </div>
-        
+
         <script>
-            document.addEventListener("DOMContentLoaded", function()
+            document.addEventListener("DOMContentLoaded", function () 
             {
-                function desvanecerMensaje(id)
+                function desvanecerMensaje(id) 
                 {
                     const msg = document.getElementById(id);
-                    if(msg)
+                    if (msg) 
                     {
                         setTimeout(() => 
                         {
                             msg.classList.add("fade");
                             msg.style.opacity = "0";
-                            setTimeout(() => msg.remove(), 1000); // Elimina el div después de 1 seg.
-                        }, 3000); // Espera 3 seg antes de desaparecer
+                            setTimeout(() => msg.remove(), 1000);
+                        }, 3000);
                     }
                 }
                 desvanecerMensaje("errorMessage");
                 desvanecerMensaje("logoutMessage");
             });
-        </script>
+
+            const signupModal = document.getElementById('signupModal');
+            signupModal.addEventListener('show.bs.modal', event =>
+            {
+                const button = event.relatedTarget;
+                const recipient = button?.getAttribute('data-bs-whatever') || 'nuevo usuario';
+                const modalTitle = signupModal.querySelector('.modal-title');
+                modalTitle.textContent = 'Registrar ' + recipient;
+            });
             
-        </div>
+            function validarPasswords()
+            {
+                var pass = document.getElementById("password").value;
+                var confirmPass = document.getElementById("confirmPassword").value;
+
+                if (pass != confirmPass)
+                {
+                    alert("Las contraseñas no coinciden.");
+                } else
+                {
+                    document.getElementById("userForm").submit();
+                }
+            }       
+
+            $(document).ready(function ()
+            {
+                $("#paisddl").change(function ()
+                {
+                    $.ajax(
+                            {
+                                type: "GET",
+                                url: "http://127.0.0.1:8080/api/estado/pais/" + $("#paisddl").val(),
+                                contentType: "application/json",
+                                dataType: 'json',
+                                success: function (data, textStatus, jqXHR)
+                                {
+                                    if (data.correct)
+                                    {
+                                        $("#estadoddl").empty();
+                                        $("#estadoddl").append("<option value=0 selected>Selecciona un estado</option>");
+                                        $("#municipioddl").empty();
+                                        $("#municipioddl").append("<option value=0 selected>Selecciona un municipio</option>");
+                                        $("#coloniaddl").empty();
+                                        $("#coloniaddl").append("<option value=0 selected>Selecciona una colonia</option>");
+                                        console.log("Respuesta del servidor:", data.object);
+                                        $.each(data.object, function (indice, estado)
+                                        {
+                                            $("#estadoddl").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>");
+                                        });
+                                    } else
+                                    {
+                                        console.log("No hay datos");
+                                    }
+                                }, error: function (jqXHR, textStatus, errorThrown)
+                                {
+                                    alert("Algo ha salido mal.");
+                                }
+                            });
+                        });
+
+
+                $("#estadoddl").change(function ()
+                {
+                    $.ajax(
+                            {
+                                type: "GET",
+                                url: "http://127.0.0.1:8080/api/municipio/estado/" + $("#estadoddl").val(),
+                                contentType: "application/json",
+                                dataType: "json",
+                                success: function (data, textStatus, jqXHR)
+                                {
+                                    if (data.correct)
+                                    {
+                                        $("#municipioddl").empty();
+                                        $("#municipioddl").append("<option value=0 selected>Selecciona un municipio</option>");
+                                        $.each(data.object, function (indice, municipio)
+                                        {
+                                            $("#municipioddl").append("<option value=" + municipio.idMunicipio + ">" + municipio.nombre + "</option>");
+                                        });
+                                    } else
+                                    {
+                                        console.log("No hay datos");
+                                    }
+                                }, error: function (textStatus, jqXHR, errorThrown)
+                                {
+                                    alert("Algo ha salido mal.");
+                                }
+                            });
+                        });
+
+
+                $("#municipioddl").change(function ()
+                {
+                    $.ajax(
+                            {
+                                type: "GET",
+                                url: "http://127.0.0.1:8080/api/colonia/municipio/" + $("#municipioddl").val(),
+                                contentType: "application/json",
+                                dataType: "json",
+                                success: function (data, textStatus, jqXHR)
+                                {
+                                    if (data.correct)
+                                    {
+                                        $("#coloniaddl").empty();
+                                        $("#coloniaddl").append("<option value=0 selected>Selecciona una colonia</option>");
+                                        $.each(data.object, function (indice, colonia)
+                                        {
+                                            $("#coloniaddl").append("<option value=" + colonia.idColonia + ">" + colonia.nombre + "</option>");
+                                            $("#coloniaddl").change(function ()
+                                            {
+                                                $("#codigoPostal").val(colonia.codigoPostal);
+                                            })
+                                        });
+                                    } else
+                                    {
+                                        console.log("No hay datos");
+                                    }
+                                }, error: function (textStatus, jqXHR, errorThrown)
+                                {
+                                    alert("Algo ha salido mal.");
+                                }
+                            });
+                        });
+                    });
+        </script>
     </section>
 </html>

@@ -3,147 +3,251 @@
       layout:decorate="~{layout}">
 
     <section layout:fragment="body" style="background-color: #2B3035;">
-        <div class="container">
-            <div>
-                <!-- Formulario para búsqueda abierta -->
-                <form id="filterForm" method="post" th:action="@{/usuario}"  th:object="${usuarioBusqueda}" style="padding-top: 10px;">
-                    <div class="row gx-2 gx-md-3 mb-7">
-                        <!-- Área de búsqueda por nombre -->
-                        <div class= "col-md-2 mb-2 mb-md-0">
-                            <div class="input-group input-group-merge">
-                                <span class="input-group-prepend input-group-text"><i class="bi bi-person"></i></span>
-                                <input type="text" class="form-control form-control-md" id="filtroNombreUsuario" placeholder="Nombre usuario" th:field="*{Nombre}">
+        <div class="container text-white mt-3">
+
+            <!-- Banner según rol -->
+            <div class="alert alert-info text-center fs-5" th:if="${session.userRole != null}">
+                <strong th:switch="${session.userRole}">
+                    <span th:case="'Administrador'">Modo Administrador: acceso completo a todos los usuarios.</span>
+                    <span th:case="'Editor'">Modo Editor: puede ver y editar a todos los usuarios.</span>
+                    <span th:case="'Lector'">Modo Lector: solo lectura, solo puede modificarse a sí mismo.</span>
+                    <span th:case="'Invitado'">Modo Invitado: acceso restringido solo a su propio perfil.</span>
+                </strong>
+            </div>
+
+            <!-- Buscador solo para Administrador y Editor-->
+            <div th:if="${(session.userRole == 'Administrador') || (session.userRole == 'Editor')}" class="mt-4">
+                <form id="filterForm" method="post" th:action="@{/usuario}" th:object="${usuarioBusqueda}">
+                    <div class="row gx-2 gx-md-3 mb-4">
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" placeholder="Nombre" th:field="*{Nombre}">
                             </div>
                         </div>
-                        <!-- Área de búsqueda por apellido paterno -->
-                        <div class="col-md-3 mb-3 mb-md-0">
-                            <div class="input-group input-group-merge">
-                                <span class="input-group-prepend input-group-text"><i class="bi bi-person"></i></span>
-                                <input type="text" class="form-control form-control-md" id="filtroApellidoPaterno" placeholder="Apellido paterno" th:field="*{ApellidoPaterno}">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" placeholder="Apellido Paterno" th:field="*{ApellidoPaterno}">
                             </div>
                         </div>
-                        <!-- Área de búsqueda por apellido materno -->
-                        <div class="col-md-3 mb-3 mb-md-0">
-                            <div class="input-group input-group-merge">
-                                <span class="input-group-prepend input-group-text"><i class="bi bi-person"></i></i></span>
-                                <input type="text" class="form-control form-control-md" id="filtroApellidoMaterno" placeholder="Apellido materno" th:field="*{ApellidoMaterno}">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" placeholder="Apellido Materno" th:field="*{ApellidoMaterno}">
                             </div>
                         </div>
-                        <!-- Área de búsqueda por rol -->
-                        <div class="col-md-2 mb-2 mb-md-0">
-                            <div class="input-group input-group-merge">
-                                <span class="input-group-prepend input-group-text"><i class="bi bi-person-rolodex"></i></span>
-                                <select id="filtroRol" class="form-select form-select-md" aria-label="Rol" th:field="*{rol.IdRol}">
-                                    <option value= "0" selected>Rol</option>
-                                    <option th:each="rol : ${roles}" th:text="${rol.nombre}" th:value="${rol.IdRol}">One</option>
+                        <div class="col-md-2">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-rolodex"></i></span>
+                                <select class="form-select" th:field="*{rol.IdRol}">
+                                    <option value="0">Rol</option>
+                                    <option th:each="rol : ${roles}" th:text="${rol.nombre}" th:value="${rol.IdRol}"></option>
                                 </select>
                             </div>
                         </div>
-                        <!-- Botón de búsqueda -->
-                        <div class="col-md-2 mb-2 mb-md-0">
-                            <button type="submit" class="btn btn-primary btn-md" id="botonBuscar"><i class="bi-search"></i> Buscar</button>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi-search"></i> Buscar
+                            </button>
                         </div>
                     </div>
                 </form>
-                
-                <!-- Agregar usuario -->
             </div>
-            <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4 col-4" style="align-items: center; padding-bottom: 10px">
-                <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario=0)}" class="btn btn-success btn-lg" style="justify-content: center; align-items: center">Agregar usuario <i class="bi bi-person-add"></i></a>
+
+            <!-- Agregar usuario solo para Administrador -->
+            <div th:if="${session.userRole == 'Administrador'}" class="mb-3">
+                <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario=0)}" class="btn btn-success btn-lg">
+                    Agregar usuario <i class="bi bi-person-add"></i>
+                </a>
             </div>
 
             <!-- Tabla de usuarios -->
-            <table class = "table table-hover table-striped-columns" style="overflow-x: auto"> 
-                <thead>
-                    <tr class = "table table-dark" style="text-align: center">
-                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Status</th>
-                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >#</th>
-                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Imagen</th>
-                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Username</th>
-                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Nombre Completo</th>
-                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2" >Datos personales</th>
-                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Contacto</th>
-                        <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" >Rol</th>
-                        <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">Direccion</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="usuario : ${usuarios}">
-                        <!-- Status -->
-                        <td>
-                            <label class="switch">
-                                <input type="checkbox" class="toggleStatus" th:attr="data-idusuario=${usuario.IdUsuario}" th:checked="${usuario.Status == 1}">
-                                <span class="slider round"></span>
-                            </label>
-                        </td>
-                        <!-- Botones UsuarioDetail / Eliminar usuario -->
-                        <td>
-                            <a th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-                            <a th:href="@{/usuario/delete/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-danger"><i class="bi bi-trash3-fill"></i></a>
-                        </td>
-                        <!-- Imagen del usuario -->
-                        <td>
-                            <img id="imagenUsuario" style="max-height: 80px; max-width: auto" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|"/>
-                        </td>
-                        <!--Username -->
-                        <td th:text ="${usuario.Username}"></td>
-                        <!-- Nombre completo -->
-                        <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
-                        <!-- Datos personales -->
-                        <td>
-                            <ol>
-                                <li th:text="${#dates.format(usuario.FechaNacimiento, 'dd-MMM-yyyy')}"></li>
-                                <li th:text="${usuario.Sexo}"></li>
-                                <li th:text="${usuario.Curp}"></li>
-                            </ol>
-                        </td>
-                        <!-- Datos de contacto -->
-                        <td>
-                            <ol>
-                                <li th:text="${usuario.Email}"></li>
-                                <li th:text="${usuario.Telefono}"></li>
-                                <li th:text="${usuario.Celular}"></li>
-                            </ol>
-                        </td>
-                        <!-- Roles -->
-                        <td th:each="rol : ${usuario.Rol}" th:text ="${rol.Nombre}"></td>
-                        <!-- Direcciones -->
-                        <td>
-                            <ul>
-                                <li th:each=" direccion : ${usuario.Direccion}" th:text="|${direccion.calle}, ${direccion.NumeroExterior}, ${direccion.NumeroInterior},
-                                    ${direccion.Colonia.Nombre}, ${direccion.Colonia.CodigoPostal}, ${direccion.Colonia.Municipio.Nombre}, 
-                                    ${direccion.Colonia.Municipio.Estado.Nombre}, ${direccion.Colonia.Municipio.Estado.Pais.Nombre}|"></li>
-                            </ul>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped-columns align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1" th:if="${session.userRole == 'Administrador'}">Status</th>
+                            <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1">Acciones</th>
+                            <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1">Imagen</th>
+                            <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1">Username</th>
+                            <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">Nombre completo</th>
+                            <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">Datos personales</th>
+                            <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1">Contacto</th>
+                            <th scope="col-xxl-1 col-xl-1 col-lg-1 col-md-1 col-sm-1 col-1">Rol</th>
+                            <th scope="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2 col-2">Dirección</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <!--  ADMIN & EDITOR (ven todos los usuarios) -->
+                        <tr th:each="usuario : ${usuarios}"
+                            th:if="${session.userRole == 'Administrador' or session.userRole == 'Editor'}">
+
+                            <!-- STATUS (solo Admin) -->
+                            <td th:if="${session.userRole == 'Administrador'}">
+                                <label class="switch">
+                                    <input type="checkbox" class="toggleStatus" th:attr="data-idusuario=${usuario.IdUsuario}" th:checked="${usuario.Status == 1}">
+                                    <span class="slider round"></span>
+                                </label>
+                            </td>
+
+                            <!-- ACCIONES -->
+                            <td>
+                                <!-- ADMIN -->
+                                <a th:if="${session.userRole == 'Administrador'}" th:href="@{/usuario/action/{idUsuario}(idUsuario=${usuario.IdUsuario})}" class="btn btn-success btn-sm"><i class="bi bi-pencil-square"></i></a>
+                                <a th:if="${session.userRole == 'Administrador'}" th:href="@{/usuario/delete/{idUsuario}(idUsuario=${usuario.IdUsuario})}" class="btn btn-danger btn-sm"><i class="bi bi-trash3-fill"></i></a>
+
+                                <!-- EDITOR -->
+                                <a th:if="${session.userRole == 'Editor'}" th:href="@{/usuario/action/{idUsuario}(idUsuario=${usuario.IdUsuario})}" class="btn btn-success btn-sm"><i class="bi bi-pencil-square"></i></a>
+                            </td>
+
+                            <!-- IMAGEN -->
+                            <td>
+                                <img style="max-height: 80px" th:src="|${usuario.Imagen != null ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|">
+                            </td>
+
+                            <!-- USERNAME -->
+                            <td th:text="${usuario.Username}"></td>
+
+                            <!-- NOMBRE COMPLETO -->
+                            <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+
+                            <!-- DATOS PERSONALES -->
+                            <td>
+                                <ol>
+                                    <li th:text="${#dates.format(usuario.FechaNacimiento, 'dd-MMM-yyyy')}"></li>
+                                    <li th:text="${usuario.Sexo}"></li>
+                                    <li th:text="${usuario.Curp}"></li>
+                                </ol>
+                            </td>
+
+                            <!-- CONTACTO -->
+                            <td>
+                                <ol>
+                                    <li th:text="${usuario.Email}"></li>
+                                    <li th:text="${usuario.Telefono}"></li>
+                                    <li th:text="${usuario.Celular}"></li>
+                                </ol>
+                            </td>
+
+                            <!-- ROL -->
+                            <td th:text="${usuario.Rol.Nombre}"></td>
+
+                            <!-- DIRECCIÓN -->
+                            <td>
+                                <ol th:each="direccion : ${usuario.Direcciones}">
+                                    <li th:text="|${direccion.Calle}, ${direccion.NumeroExterior}, ${direccion.NumeroInterior},
+                                        ${direccion.Colonia.Nombre}, ${direccion.Colonia.Municipio.Nombre},
+                                        ${direccion.Colonia.Municipio.Estado.Nombre}, ${direccion.Colonia.Municipio.Estado.Pais.Nombre}|"></li>
+                                </ol>
+                            </td>
+                        </tr>
+
+                        <!-- LECTOR (solo él mismo, con botón EDITAR) -->
+                        <tr th:each="usuario : ${usuarios}"
+                            th:if="${session.userRole == 'Lector' && usuario.Username == session.username}">
+
+                            <td>
+                                <a th:href="@{/usuario/action/{idUsuario}(idUsuario=${usuario.IdUsuario})}" class="btn btn-success btn-sm"><i class="bi bi-pencil-square"></i></a>
+                            </td>
+                            <td>
+                                <img style="max-height: 80px" th:src="|${usuario.Imagen != null ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|">
+                            </td>
+                            <td th:text="${usuario.Username}"></td>
+                            <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+                            <td>
+                                <ol>
+                                    <li th:text="${#dates.format(usuario.FechaNacimiento, 'dd-MMM-yyyy')}"></li>
+                                    <li th:text="${usuario.Sexo}"></li>
+                                    <li th:text="${usuario.Curp}"></li>
+                                </ol>
+                            </td>
+                            <td>
+                                <ol>
+                                    <li th:text="${usuario.Email}"></li>
+                                    <li th:text="${usuario.Telefono}"></li>
+                                    <li th:text="${usuario.Celular}"></li>
+                                </ol>
+                            </td>
+                            <td th:text="${usuario.Rol.Nombre}"></td>
+                            <td>
+                                <ol th:each="direccion : ${usuario.Direcciones}">
+                                    <li th:text="|${direccion.Calle}, ${direccion.NumeroExterior}, ${direccion.NumeroInterior},
+                                        ${direccion.Colonia.Nombre}, ${direccion.Colonia.Municipio.Nombre},
+                                        ${direccion.Colonia.Municipio.Estado.Nombre}, ${direccion.Colonia.Municipio.Estado.Pais.Nombre}|"></li>
+                                </ol>
+                            </td>
+                        </tr>
+
+                        <!--  INVITADO (solo él mismo, celda Acciones = "Sin permisos") -->
+                        <tr th:each="usuario : ${usuarios}"
+                            th:if="${session.userRole == 'Invitado' && usuario.Username == session.username}">
+                            <td><span class="text-muted">Sin permisos</span></td>
+                            <td>
+                                <img style="max-height: 80px" th:src="|${usuario.Imagen != null ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|">
+                            </td>
+                            <td th:text="${usuario.Username}"></td>
+                            <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+                            <td>
+                                <ol>
+                                    <li th:text="${#dates.format(usuario.FechaNacimiento, 'dd-MMM-yyyy')}"></li>
+                                    <li th:text="${usuario.Sexo}"></li>
+                                    <li th:text="${usuario.Curp}"></li>
+                                </ol>
+                            </td>
+                            <td>
+                                <ol>
+                                    <li th:text="${usuario.Email}"></li>
+                                    <li th:text="${usuario.Telefono}"></li>
+                                    <li th:text="${usuario.Celular}"></li>
+                                </ol>
+                            </td>
+                            <td th:text="${usuario.Rol.Nombre}"></td>
+                            <td>
+                                <ol th:each="direccion : ${usuario.Direcciones}">
+                                    <li th:text="|${direccion.Calle}, ${direccion.NumeroExterior}, ${direccion.NumeroInterior},
+                                        ${direccion.Colonia.Nombre}, ${direccion.Colonia.Municipio.Nombre},
+                                        ${direccion.Colonia.Municipio.Estado.Nombre}, ${direccion.Colonia.Municipio.Estado.Pais.Nombre}|"></li>
+                                </ol>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mensaje si no hay usuarios -->
+            <div th:if="${#lists.isEmpty(usuarios)}" class="alert alert-warning text-center fs-5 mt-4">
+                No se encontraron usuarios para mostrar.
+            </div>
+
         </div>
+
+        <!-- Script para actualizar Status -->
         <script>
-            $(document).on("change", ".toggleStatus", function () {
+            $(document).on("change", ".toggleStatus", function ()
+            {
                 let checkbox = $(this);
                 let idUsuario = checkbox.data("idusuario");
                 let nuevoStatus = checkbox.is(":checked") ? 1 : 0;
-                console.log("idUsuario = ", idUsuario, "nuevoStatus = ", nuevoStatus);
 
-                $.ajax({
-                    type: 'PATCH',
-                    url: "http://127.0.0.1:8080/api/usuario/status/" + idUsuario,
-                    data: JSON.stringify({status: nuevoStatus}),
-                    contentType: "application/json",
-                    success: function (response)
-                    {
-                        console.log("Estado actualizado: ", response);
-                    },
-                    error: function (xhr, status, error)
-                    {
-                        console.error("Error al actualizar estado: ", error);
-                        console.log("Detalle: ", xhr.responseText);
-
-                        checkbox.prop("checked", !checkbox.is(":checked"));
-                        alert("No se pudo actualizar el estado.");
-                    }
-                });
+                $.ajax(
+                        {
+                            type: 'PATCH',
+                            url: "http://127.0.0.1:8080/api/usuario/status/" + idUsuario,
+                            data: JSON.stringify({status: nuevoStatus}),
+                            contentType: "application/json",
+                            success: function (response)
+                            {
+                                console.log("Estado actualizado: ", response);
+                            }, error: function (xhr, status, error)
+                            {
+                                console.error("Error al actualizar estado: ", error);
+                                console.log("Detalle: ", xhr.responseText);
+                                checkbox.prop("checked", !checkbox.is(":checked"));
+                                alert("No se pudo actualizar el estado.");
+                            }
+                        });
             });
         </script>
     </section>

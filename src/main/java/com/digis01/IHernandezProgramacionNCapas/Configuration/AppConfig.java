@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -16,7 +15,7 @@ public class AppConfig
         RestTemplate restTemplate = builder
                 .additionalInterceptors((request, body, execution) -> 
                 {
-                    String token = (String) session.getAttribute("jwtToken");
+                    String token = (String) session.getAttribute("token");
                     if (token != null && !token.isEmpty()) 
                     {
                         request.getHeaders().add("Authorization", "Bearer " + token);

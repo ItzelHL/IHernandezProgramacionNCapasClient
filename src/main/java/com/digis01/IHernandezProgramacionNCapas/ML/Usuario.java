@@ -7,7 +7,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 public class Usuario 
 {
-
     private int Status;
     private int IdUsuario;
     private String Imagen;
@@ -25,7 +24,7 @@ public class Usuario
     private String Curp;
     public Rol Rol;
     @JsonProperty("Direcciones")
-    public List<Direccion> Direccion;
+    public List<Direccion> Direcciones;
 
     public Usuario() {}
 
@@ -191,12 +190,12 @@ public class Usuario
         return Rol;
     }
 
-    public void setDireccion(List<Direccion> direccion) 
+    public void setDirecciones(List<Direccion> direccion) 
     {
-        this.Direccion = direccion;
+        this.Direcciones = direccion;
     }
-    public List<Direccion> getDireccion()
+    public List<Direccion> getDirecciones()
     {
-        return Direccion;
+        return Direcciones;
     }
 }
