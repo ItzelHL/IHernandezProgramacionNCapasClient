@@ -58,7 +58,7 @@
             <!-- Agregar usuario solo para Administrador -->
             <div th:if="${session.userRole == 'Administrador'}" class="mb-3">
                 <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario=0)}" class="btn btn-success btn-lg">
-                    Agregar usuario <i class="bi bi-person-add"></i>
+                    Registrar usuario <i class="bi bi-person-add"></i>
                 </a>
             </div>
 
@@ -234,7 +234,7 @@
                 $.ajax(
                         {
                             type: 'PATCH',
-                            url: "http://127.0.0.1:8080/api/usuario/status/" + idUsuario,
+                            url: "http://localhost:8080/api/usuario/status/" + idUsuario,
                             data: JSON.stringify({status: nuevoStatus}),
                             contentType: "application/json",
                             success: function (response)

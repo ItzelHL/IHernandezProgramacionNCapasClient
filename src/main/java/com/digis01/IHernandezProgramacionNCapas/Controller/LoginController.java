@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Controller
@@ -33,43 +34,43 @@ public class LoginController
     }
     
     @GetMapping
-    public String Login(Model model, @RequestParam(required = false) String logout, @RequestParam(required = false) String error)
-    {       
-            ResponseEntity <Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol", 
-                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
-                                                                                                            new ParameterizedTypeReference<Result<List<Rol>>>(){
-                                                                                                            });
-            ResponseEntity <Result<List<Pais>>> responsePais = restTemplate.exchange("http://localhost:8080/api/pais", 
-                                                                                                            HttpMethod.GET, HttpEntity.EMPTY, 
-                                                                                                            new ParameterizedTypeReference<Result<List<Pais>>>(){
-                                                                                                            });
-            if (responseRol.getStatusCode() == HttpStatusCode.valueOf(200)) 
+    public String Login(Model model, @RequestParam(required = false) String logout, @RequestParam(required = false) String error) 
+    {   
+        ResponseEntity<Result<List<Rol>>> responseRol = restTemplate.exchange("http://localhost:8080/api/rol",
+                                                                                                                HttpMethod.GET, HttpEntity.EMPTY,
+                                                                                                                new ParameterizedTypeReference<Result<List<Rol>>>() {});
+        if (responseRol.getStatusCode() == HttpStatusCode.valueOf(200)) 
+        {
+            Result resultRol = responseRol.getBody();
+            if (resultRol.correct) 
             {
-                Result resultRol = responseRol.getBody();
-                if(resultRol.correct)
-                {
-                    model.addAttribute("roles", resultRol.object);
-                }else{
-                    model.addAttribute("roles", null);
-                }
-            }
-            
-            if (responsePais.getStatusCode() == HttpStatusCode.valueOf(200)) 
+                model.addAttribute("roles", resultRol.object);
+            } else 
             {
-                Result resultPais = responsePais.getBody();
-                if (resultPais.correct) 
-                {
-                    model.addAttribute("paises", resultPais.object);
-                } else {
-                    model.addAttribute("paises", null);
-                }
+                model.addAttribute("roles", null);
             }
+        }
         
+        ResponseEntity<Result<List<Pais>>> responsePais = restTemplate.exchange("http://localhost:8080/api/pais",
+                                                                                                                HttpMethod.GET, HttpEntity.EMPTY,
+                                                                                                                new ParameterizedTypeReference<Result<List<Pais>>>() {});
+        if (responsePais.getStatusCode() == HttpStatusCode.valueOf(200)) 
+        {
+            Result resultPais = responsePais.getBody();
+            if (resultPais.correct) 
+            {
+                model.addAttribute("paises", resultPais.object);
+            } else 
+            {
+                model.addAttribute("paises", null);
+            }
+        }
+
         if (error != null) 
         {
             model.addAttribute("error", "Usuario deshabilitado, contacte al administrador.");
         }
-        if(logout != null)
+        if (logout != null) 
         {
             model.addAttribute("logout", "Sesión cerrada correctamente.");
         }
@@ -83,7 +84,7 @@ public class LoginController
         usuario.setUsername(username);
         usuario.setPassword(password);
         try 
-        {
+        {        
             HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
             ResponseEntity<Map> responseEntity = restTemplate.postForEntity("http://localhost:8080/auth/login", 
                                                                                                                                 entity, Map.class);
@@ -119,7 +120,18 @@ public class LoginController
             model.addAttribute("error", "Credenciales inválidas");
             return "Login";
 
-        } catch (Exception ex) 
+        }
+        catch(HttpClientErrorException.Forbidden ex)
+        {
+            model.addAttribute("error", "Tu cuenta no ha sido verificada, revisa tu correo y haz clic en el enlace de activación.");
+            return "Login";
+        }
+        catch(HttpClientErrorException.Unauthorized ex)
+        {
+            model.addAttribute("error", "Usuario o contraseña incorrectos.");
+            return "Login";
+        }
+        catch (Exception ex) 
         {
             model.addAttribute("error", "Error al iniciar sesión: " + ex.getLocalizedMessage());
             return "Login";

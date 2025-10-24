@@ -21,7 +21,7 @@
                         <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg" class="img-fluid" alt="Phone image">
                     </div>
 
-                    <!-- FORMULARIO DE LOGIN -->
+                    <!-- FORMULARIO DE INICIO DE SESIÓN -->
                     <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
 
                         <h4 class="mb-3 text-align-center text-white">INICIA SESIÓN</h4>
@@ -46,8 +46,8 @@
                         <hr style="border-color: white">
 
                         <!-- Enlace de registro -->
-                        <div class="signup-link text-white"> No estás registrado? </div>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal"> Regístrate </button>
+<!--                        <div class="signup-link text-white"> No estás registrado? </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signupModal"> Regístrate </button>-->
                     </div>
                 </div>
             </form><!-- FIN LOGIN FORM -->
@@ -63,45 +63,45 @@
                         </div>
 
                         <!-- FORMULARIO DE REGISTRO -->
-                        <form id="signupForm" method="post" th:action="@{/login/signup}" th:object="${usuario}">
+<!--                        <form id="signupForm" method="post" th:action="@{/login/signup}" th:object="${usuario}">
                             
                             <div class="modal-body">
 
-                                <!-- DATOS GENERALES -->
+                                 DATOS GENERALES 
                                 <h4 class="mb-3">Datos generales</h4>
                                 <div class="row g-3">
                                     
-                                    <!-- Username -->
+                                     Username 
                                     <div class="col-md-3">
                                         <label class="form-label">Username</label>
                                         <input th:field="*{username}" class="form-control" placeholder="Username" required>
                                     </div>
                                     
-                                    <!-- Nombre -->
+                                     Nombre 
                                     <div class="col-md-3">
                                         <label class="form-label">Nombre</label>
                                         <input th:field="*{nombre}" class="form-control" placeholder="Nombre" required>
                                     </div>
                                     
-                                    <!-- Apellido paterno -->
+                                     Apellido paterno 
                                     <div class="col-md-3">
                                         <label class="form-label">Apellido paterno</label>
                                         <input th:field="*{apellidoPaterno}" class="form-control" placeholder="Apellido paterno" required>
                                     </div>
                                     
-                                    <!-- Apellido materno -->
+                                     Apellido materno 
                                     <div class="col-md-3">
                                         <label class="form-label">Apellido materno</label>
                                         <input th:field="*{apellidoMaterno}" class="form-control" placeholder="Apellido materno" required>
                                     </div>
                                     
-                                    <!-- Fecha de nacimiento -->
+                                     Fecha de nacimiento 
                                     <div class="col-md-3">
                                         <label class="form-label">Fecha de nacimiento</label>
                                         <input type="date" th:field="*{fechaNacimiento}" class="form-control" required>
                                     </div>
                                     
-                                    <!-- Sexo -->
+                                     Sexo 
                                     <div class="col-md-3">
                                         <label class="form-label">Sexo</label>
                                         <div>
@@ -114,19 +114,19 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Curp -->
+                                     Curp 
                                     <div class="col-md-3">
                                         <label class="form-label">CURP</label>
                                         <input th:field="*{curp}" class="form-control" placeholder="CURP" required>
                                     </div>
                                     
-                                    <!-- Email -->
+                                     Email 
                                     <div class="col-md-3">
                                         <label class="form-label">Email</label>
                                         <input th:field="*{email}" type="email" class="form-control" placeholder="example@example.com" required>
                                     </div>
                                     
-                                    <!-- Password -->
+                                     Password 
                                     <div class="col-md-3">
                                         <label class="form-label">Password</label>
                                         <input th:field="*{password}" type="password" class="form-control" required>
@@ -136,19 +136,19 @@
                                         <input id="confirmPassword" type="password" class="form-control" required>
                                     </div>
                                     
-                                    <!-- Teléfono -->
+                                     Teléfono 
                                     <div class="col-md-3">
                                         <label class="form-label">Teléfono</label>
                                         <input th:field="*{telefono}" class="form-control" placeholder="1122334455" required>
                                     </div>
                                     
-                                    <!-- Celular -->
+                                     Celular 
                                     <div class="col-md-3">
                                         <label class="form-label">Celular</label>
                                         <input th:field="*{celular}" class="form-control" placeholder="1122334455" required>
                                     </div>
                                     
-                                    <!-- Rol -->
+                                     Rol 
                                     <div class="col-md-3">
                                         <label class="form-label">Rol</label>
                                         <select class="form-select" th:field="*{rol.idRol}">
@@ -158,12 +158,12 @@
                                     </div>
                                 </div>
 
-                                <!-- DIRECCIÓN -->
+                                 DIRECCIÓN 
                                 <hr class="my-4">
                                 <h4 class="mb-3">Dirección</h4>
                                 <div class="row g-3">
                                     
-                                    <!-- País -->
+                                     País 
                                     <div class="col-md-3">
                                         <label for="paisddl" class="form-label">País</label>
                                         <select id="paisddl" class="form-select" th:field="*{Direccion[0].Colonia.Municipio.Estado.Pais.IdPais}">
@@ -172,7 +172,7 @@
                                         </select>
                                     </div>
                                     
-                                    <!-- Estado -->
+                                     Estado 
                                     <div class="col-md-3">
                                         <label for="estadoddl" class="form-label">Estado</label>
                                         <select id="estadoddl" class="form-select" th:field="*{Direccion[0].Colonia.Municipio.Estado.IdEstado}">
@@ -181,7 +181,7 @@
                                         </select>
                                     </div>
                                     
-                                    <!-- Municipio -->
+                                     Municipio 
                                     <div class="col-md-3">
                                         <label for="municipioddl" class="form-label">Municipio</label>
                                         <select id="municipioddl" class="form-select" th:field="*{Direccion[0].Colonia.Municipio.idMunicipio}">
@@ -190,7 +190,7 @@
                                         </select>
                                     </div>
                                     
-                                    <!-- Colonia -->
+                                     Colonia 
                                     <div class="col-md-3">
                                         <label for="coloniaddl" class="form-label">Colonia</label>
                                         <select id="coloniaddl" class="form-select" th:field="*{Direccion[0].Colonia.IdColonia}">
@@ -199,25 +199,25 @@
                                         </select>
                                     </div>
                                     
-                                    <!-- Código postal -->
+                                     Código postal 
                                     <div class="col-md-3">
                                         <label for="codigoPostal" class="form-label">Código Postal</label>
                                         <input id="codigoPostal" th:field="*{Direccion[0].Colonia.codigoPostal}" type="text" class="form-control" placeholder="Código Postal" disabled>
                                     </div>
                                     
-                                    <!-- Calle -->
+                                     Calle 
                                     <div class="col-md-3">
                                         <label class="form-label">Calle</label>
                                         <input th:field="*{Direccion[0].Calle}" class="form-control" placeholder="Calle" required>
                                     </div>
                                     
-                                    <!-- Número exterior -->
+                                     Número exterior 
                                     <div class="col-md-3">
                                         <label class="form-label">Número exterior</label>
                                         <input th:field="*{Direccion[0].NumeroExterior}" class="form-control" placeholder="Número exterior" required>
                                     </div>
                                     
-                                    <!-- Número interior -->
+                                     Número interior 
                                     <div class="col-md-3">
                                         <label class="form-label">Número interior</label>
                                         <input th:field="*{Direccion[0].NumeroInterior}" class="form-control" placeholder="Número interior">
@@ -230,10 +230,10 @@
                                         data-bs-dismiss="modal">Cerrar</button>
                                 <button type="submit" class="btn btn-primary">Registrarse</button>
                             </div>
-                        </form> <!-- FIN FORMULARIO REGISTRO -->
+                        </form>  FIN FORMULARIO REGISTRO 
                     </div>
                 </div>
-            </div> <!-- FIN MODAL -->
+            </div>  FIN MODAL -->
         </div>
 
         <script>
