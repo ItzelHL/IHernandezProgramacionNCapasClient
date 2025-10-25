@@ -349,9 +349,8 @@ public class UsuarioController
                 usuario.setImagen(validarImagen(imagen));
                 HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
                 ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8080/api/usuario/add",
-                                                                                                                                                     HttpMethod.POST, entity,
-                                                                                                                              new ParameterizedTypeReference<Result<Usuario>>() 
-                                                                                                                                                      {   });
+                                                                                                                                                   HttpMethod.POST, entity,
+                                                                                                                                                             new ParameterizedTypeReference<Result<Usuario>>(){});
                 if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) 
                 {
                     model.addAttribute("usuario", new Usuario());

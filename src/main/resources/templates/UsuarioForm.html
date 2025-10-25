@@ -11,11 +11,11 @@
             <form id="userForm" method="post" th:object="${usuario}" th:action="@{/usuario/add}" enctype="multipart/form-data">
                 
                 <!-- Recibir Id's para identificar lo que se va a mostrar del formulario -->
-                <input type="hidden" th:field="*{IdUsuario}">
-                <input type="hidden" th:field="*{Direccion[0].IdDireccion}">
+                <input type="hidden" th:field="*{idUsuario}">
+                <input type="hidden" th:field="*{Direcciones[0].idDireccion}">
                 
                 <!-- Agregar / Editar usuario -->
-                <div th:if="*{(IdUsuario == 0 && Direccion[0].IdDireccion == 0) || (IdUsuario > 0 && Direccion[0].IdDireccion == -1)}">
+                <div th:if="*{(IdUsuario == 0 && Direcciones[0].IdDireccion == 0) || (IdUsuario > 0 && Direcciones[0].IdDireccion == -1)}">
                     <hr class="my-4">
                     
                     <!-- DATOS GENERALES -->
@@ -24,7 +24,7 @@
                     <!-- Imagen del usuario -->
                     <div class="row g-3" style="display: flex; justify-content: center; align-items: center; background-color: activeborder">
                         <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-4 col-sm-4" style="align-items: center">
-                            <input type="file" id="imagenUsuario" class="form-control" name="imagenFile" required><img id="previewImage" style="max-width: 200px; max-height: auto" class="rounded mx-auto d-block" th:field="*{Imagen}" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|">
+                            <input type="file" id="imagenUsuario" class="form-control" name="imagenFile"><img id="previewImage" style="max-width: 200px; max-height: auto" class="rounded mx-auto d-block" th:field="*{Imagen}" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64,' + usuario.Imagen : 'https://tlconnect.teamlease.com/Images/Profile/default.jpg'}|">
                         </div>
                     </div>
                     
@@ -144,7 +144,7 @@
                 </div>
 
                 <!-- DIRECCIÓN -->
-                <div th:if="*{(IdUsuario == 0 && Direccion[0].IdDireccion == 0) || (IdUsuario > 0 && Direccion[0].IdDireccion == 0) || (IdUsuario > 0 && Direccion[0].IdDireccion > 0)}">
+                <div th:if="*{(IdUsuario == 0 && Direcciones[0].IdDireccion == 0) || (IdUsuario > 0 && Direcciones[0].IdDireccion == 0) || (IdUsuario > 0 && Direcciones[0].IdDireccion > 0)}">
                     <hr class="my-4">
                     <h4 class="mb-3" style="padding-bottom: 10px">Dirección</h4>
                     <div class="row g-3" style="background-color: activeborder; padding-bottom: 15px">
@@ -152,7 +152,7 @@
                         <!-- País -->
                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3"data-bs-theme="dark">
                             <label for="paisddl" class="form-label">Pais</label>
-                            <select id="paisddl" class="form-select" aria-label="Selecciona un pais" th:field="*{Direccion[0].Colonia.Municipio.Estado.Pais.IdPais}">
+                            <select id="paisddl" class="form-select" aria-label="Selecciona un pais" th:field="*{Direcciones[0].Colonia.Municipio.Estado.Pais.IdPais}">
                                 <option value= "0" selected>Selecciona un país</option>
                                 <option th:each="pais : ${paises}" th:value="${pais.IdPais}" th:text="${pais.Nombre}">One</option>
                             </select>
@@ -161,7 +161,7 @@
                         <!-- Estado -->
                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3" data-bs-theme="dark">
                             <label for="estadoddl" class="form-label">Estado</label>
-                            <select id="estadoddl" class="form-select" aria-label="Selecciona un estado" th:field="*{Direccion[0].Colonia.Municipio.Estado.IdEstado}">
+                            <select id="estadoddl" class="form-select" aria-label="Selecciona un estado" th:field="*{Direcciones[0].Colonia.Municipio.Estado.IdEstado}">
                                 <option value= "0" selected>Selecciona un estado</option>
                                 <option th:each="estado : ${estados}" th:value="${estado.IdEstado}" th:text="${estado.Nombre}">One</option>
                             </select>
@@ -170,7 +170,7 @@
                         <!-- Municipio -->
                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3"data-bs-theme="dark">
                             <label for="municipioddl" class="form-label">Municipio</label>
-                            <select id="municipioddl" class="form-select" aria-label="Selecciona un municipio" th:field="*{Direccion[0].Colonia.Municipio.idMunicipio}">
+                            <select id="municipioddl" class="form-select" aria-label="Selecciona un municipio" th:field="*{Direcciones[0].Colonia.Municipio.idMunicipio}">
                                 <option value= "0" selected>Selecciona un municipio</option>
                                 <option th:each="municipio : ${municipios}" th:value="${municipio.IdMunicipio}" th:text="${municipio.Nombre}">One</option>
                             </select>
@@ -179,7 +179,7 @@
                         <!-- Colonia -->
                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3" data-bs-theme="dark">
                             <label for="coloniaddl" class="form-label">Colonia</label>
-                            <select id="coloniaddl" class="form-select" aria-label="Selecciona una colonia" th:field="*{Direccion[0].Colonia.IdColonia}">
+                            <select id="coloniaddl" class="form-select" aria-label="Selecciona una colonia" th:field="*{Direcciones[0].Colonia.IdColonia}">
                                 <option value= "0" selected>Selecciona un colonia</option>
                                 <option th:each="colonia : ${colonias}" th:value="${colonia.IdColonia}" th:text="${colonia.Nombre}">One</option>
                             </select>
@@ -188,40 +188,40 @@
                         <!-- Código postal -->
                         <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label for="codigoPostal" class="form-label">Código Postal</label>
-                            <input id="codigoPostal" disabled type="text" class="form-control" placeholder ="Código Postal" th:field="*{Direccion[0].Colonia.codigoPostal}" required>
+                            <input id="codigoPostal" disabled type="text" class="form-control" placeholder ="Código Postal" th:field="*{Direcciones[0].Colonia.codigoPostal}" required>
                         </div>
                         
                         <!-- Calle -->
                         <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
                             <label for="calle" class="form-label">Calle</label>
-                            <input type="text" id="calle" class="form-control" placeholder ="Calle" th:field="*{Direccion[0].Calle}" required>
-                            <span class="text-danger" th:if="${#fields.hasErrors('Direccion[0].Calle')}" th:errors="*{Direccion[0].Calle}">Message error</span>
+                            <input type="text" id="calle" class="form-control" placeholder ="Calle" th:field="*{Direcciones[0].Calle}" required>
+                            <span class="text-danger" th:if="${#fields.hasErrors('Direcciones[0].Calle')}" th:errors="*{Direcciones[0].Calle}">Message error</span>
                         </div>
                         
                         <!-- Número exterior -->
                         <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label for="numeroExterior" class="form-label">Número exterior</label>
-                            <input type="text" id="numeroExterior" class="form-control" placeholder ="Número exterior" th:field="*{Direccion[0].NumeroExterior}" required>
-                            <span class="text-danger" th:if="${#fields.hasErrors('Direccion[0].NumeroExterior')}" th:errors="*{Direccion[0].NumeroExterior}">Message error</span>
+                            <input type="text" id="numeroExterior" class="form-control" placeholder ="Número exterior" th:field="*{Direcciones[0].NumeroExterior}" required>
+                            <span class="text-danger" th:if="${#fields.hasErrors('Direcciones[0].NumeroExterior')}" th:errors="*{Direcciones[0].NumeroExterior}">Message error</span>
                         </div>
                         
                         <!-- Número interior -->
                         <div class="col-xxl-2 col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label for="numeroInterior" class="form-label">Número interior</label>
-                            <input type="text" id="numeroInterior" class="form-control" placeholder ="Número interior" th:field="*{Direccion[0].NumeroInterior}" required>
-                            <span class="text-danger" th:if="${#fields.hasErrors('Direccion[0].NumeroInterior')}" th:errors="*{Direccion[0].NumeroInterior}">Message error</span>
+                            <input type="text" id="numeroInterior" class="form-control" placeholder ="Número interior" th:field="*{Direcciones[0].NumeroInterior}" required>
+                            <span class="text-danger" th:if="${#fields.hasErrors('Direcciones[0].NumeroInterior')}" th:errors="*{Direcciones[0].NumeroInterior}">Message error</span>
                         </div>
                         
                     </div>
                 </div>
                 
                 <!-- Botón agregar -->
-                <div th:if="*{(IdUsuario == 0 && Direccion[0].IdDireccion == 0) || (IdUsuario > 0 && Direccion[0].IdDireccion == 0)}">
+                <div th:if="*{(IdUsuario == 0 && Direcciones[0].IdDireccion == 0) || (IdUsuario > 0 && Direcciones[0].IdDireccion == 0)}">
                     <button type="submit" class="btn btn-success mt-4 w-100 fw-bold" id="botonAdd" th:href="@{/usuario/add}" onclick="validarPasswords()">Agregar</button>
                 </div>
                 
                 <!-- Botón editar -->
-                <div th:if="*{(IdUsuario > 0 && Direccion[0].IdDireccion == -1) || (IdUsuario > 0 && Direccion[0].IdDireccion > 0)}">
+                <div th:if="*{(IdUsuario > 0 && Direcciones[0].IdDireccion == -1) || (IdUsuario > 0 && Direcciones[0].IdDireccion > 0)}">
                     <button type="submit" class="btn btn-success mt-4 w-100 fw-bold" id="botonEdit" th:ref="@{/usuario/action/{IdUsuario}/update}">Editar</button>
                 </div>
                 

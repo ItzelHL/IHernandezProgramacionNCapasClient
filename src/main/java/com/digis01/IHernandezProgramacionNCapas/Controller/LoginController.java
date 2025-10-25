@@ -91,15 +91,24 @@ public class LoginController
 
             if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200) && responseEntity.getBody() != null) 
             {
-                Map<String, Object> response = responseEntity.getBody();
-                String token = (String) response.get("token");
+                Map<String, Object> body = responseEntity.getBody();
+                Boolean requiresVerification = (Boolean) body.get("requiresVerification");
                 
-                String extractedUsername = (String) response.get("username");
+                if (requiresVerification.equals(true)) 
+                {
+                    model.addAttribute("waitingVerification", true);
+                    model.addAttribute("pendingUsername", username);
+                    model.addAttribute("message", body.get("message"));
+                    return "Login";
+                }
+                
+                String token = (String) body.get("token"); 
+                String extractedUsername = (String) body.get("username");
                 session.setAttribute("token", token);
                 
                 ResponseEntity<Result<Usuario>> userResponse = restTemplate.exchange("http://localhost:8080/api/usuario/username/" + extractedUsername,
                                                                                                                                         HttpMethod.GET, HttpEntity.EMPTY,
-                                                                                                                                new ParameterizedTypeReference<Result<Usuario>>() {});
+                                                                                                                                                  new ParameterizedTypeReference<Result<Usuario>>() {});
                 if (userResponse.getStatusCode() == HttpStatusCode.valueOf(200) && userResponse.getBody() != null) 
                 {
                     Result<Usuario> resultUser = userResponse.getBody();
