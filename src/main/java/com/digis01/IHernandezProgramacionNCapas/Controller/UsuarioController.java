@@ -663,4 +663,11 @@ public class UsuarioController
         // En lugar de redirigir, regresar la misma vista para mostrar mensajes
         return "CargaMasiva";
     }
+    
+    @GetMapping("resetpassword")
+    public String resetPasswordForm(@RequestParam String token, Model model) 
+    {
+        model.addAttribute("token", token);
+        return "ResetPassword";
+    }
 }

@@ -181,5 +181,5 @@ public class LoginController
     {
         session.invalidate();
         return "redirect:/login?logout=true";
-    }
+    } 
 }
